@@ -395,7 +395,30 @@ void AMostArkPlayer::CheckTripodlock(int32 SkillIndex)
 {
     if (Skills.IsValidIndex(SkillIndex))
     {
-        //TODO:: 트라이포드 잠금 분기 확인
+        FSkillData& Skill = Skills[SkillIndex];
+
+        // 레벨에 따라 티어 자금 상태 설정
+        // 1단계 : 4 | 2단게 : 7 | 3단계 : 10
+        if (Skill.SkillLevel < 4 && Skill.TripodTiers.IsValidIndex(0))
+        {
+            Skill.TripodTiers[0].bIsUnlocked = false;
+            Skill.TripodTiers[0].SelectedEffectIndex = -1; // 효과 초기화
+        }
+
+        if (Skill.SkillLevel < 7 && Skill.TripodTiers.IsValidIndex(1))
+        {
+            Skill.TripodTiers[1].bIsUnlocked = false;
+            Skill.TripodTiers[1].SelectedEffectIndex = -1; // 효과 초기화
+        }
+        
+        if (Skill.SkillLevel < 10 && Skill.TripodTiers.IsValidIndex(2))
+        {
+            Skill.TripodTiers[2].bIsUnlocked = false;
+            Skill.TripodTiers[2].SelectedEffectIndex = -1; // 효과 초기화
+        }
+
+
+        UE_LOG(LogTemp, Display, TEXT("트라이포드 잠금 상태 업데이트: %s"), *Skill.SkillName);
     }
 }
 
