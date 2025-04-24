@@ -17,6 +17,12 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
 {
     OwnerPlayer = InArgs._OwnerPlayer;
 
+    // 스킬 그리드 위젯 초기화
+    SkillGridWidget = SNew(SGridPanel);
+    
+    // 초기 스킬 리스트 생성
+    CreateSkillListWidget();
+
     ChildSlot
     [
         SNew(SBorder)
@@ -41,10 +47,13 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
             .AutoHeight()
             .Padding(FMargin(0, 0, 0, 10))
             [
-                CreateSkillListWidget()
+                SNew(SBox)
+                [
+                    SkillGridWidget.ToSharedRef()
+                ]
             ]
             
-            // 트라이포드 티어 표시 영역
+                        // 트라이포드 티어 표시 영역
             + SVerticalBox::Slot()
             .FillHeight(1.0f)
             [
@@ -145,145 +154,153 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
     ];
 }
 
-TSharedRef<SWidget> STripodSystemWidget::CreateSkillListWidget()
+void STripodSystemWidget::CreateSkillListWidget()
 {
-    TSharedRef<SGridPanel> SkillGrid = SNew(SGridPanel);
+    if (!SkillGridWidget.IsValid() || !OwnerPlayer.IsValid())
+        return;
     
-    if (OwnerPlayer.IsValid())
+    // 기존 그리드 위젯의 슬롯 비우기
+    SkillGridWidget->ClearChildren();
+    
+    const int32 SkillsPerRow = 4;
+    
+    // 각 스킬에 대한 버튼 생성
+    for (int32 i = 0; i < OwnerPlayer->Skills.Num(); ++i)
     {
-        const int32 SkillsPerRow = 4;
+        int32 Row = i / SkillsPerRow;
+        int32 Column = i % SkillsPerRow;
         
-        // 각 스킬에 대한 버튼 생성
-        for (int32 i = 0; i < OwnerPlayer->Skills.Num(); ++i)
-        {
-            int32 Row = i / SkillsPerRow;
-            int32 Column = i % SkillsPerRow;
-            
-            FSkillData& Skill = OwnerPlayer->Skills[i];
-            
-            SkillGrid->AddSlot(Column, Row)
-            .Padding(5)
+        FSkillData& Skill = OwnerPlayer->Skills[i];
+        
+        SkillGridWidget->AddSlot(Column, Row)
+        .Padding(5)
+        [
+            SNew(SBox)
+            .WidthOverride(80)
+            .HeightOverride(140)
             [
-                SNew(SBox)
-                .WidthOverride(80)
-                .HeightOverride(140)  // 높이를 더 늘림
+                SNew(SVerticalBox)
+                
+                // 스킬 버튼
+                + SVerticalBox::Slot()
+                .AutoHeight()
                 [
-                    SNew(SVerticalBox)
-                    
-                    // 스킬 버튼
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
+                    SNew(SButton)
+                    .OnClicked(this, &STripodSystemWidget::OnSkillSelected, i)
+                    .HAlign(HAlign_Center)
+                    .VAlign(VAlign_Center)
                     [
-                        SNew(SButton)
-                        .OnClicked(this, &STripodSystemWidget::OnSkillSelected, i)
-                        .HAlign(HAlign_Center)
-                        .VAlign(VAlign_Center)
+                        SNew(SBox)
+                        .WidthOverride(64)
+                        .HeightOverride(64)
                         [
-                            SNew(SBox)
-                            .WidthOverride(64)
-                            .HeightOverride(64)
-                            [
-                                SNew(SBorder)
-                                .HAlign(HAlign_Center)
-                                .VAlign(VAlign_Center)
-                                [
-                                    SNew(STextBlock)
-                                    .Text(FText::FromString(Skill.SkillName.Left(1)))
-                                ]
-                            ]
-                        ]
-                    ]
-                    
-                    // 스킬 이름
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    [
-                        SNew(STextBlock)
-                        .Text(FText::FromString(Skill.SkillName))
-                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
-                    ]
-                    
-                    // 레벨 표시
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    [
-                        SNew(STextBlock)
-                        .Text(FText::FromString(FString::Printf(TEXT("Lv. %d"), Skill.SkillLevel)))
-                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
-                    ]
-                    
-                    // 스킬 포인트 표시
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    .Padding(FMargin(0, 2))
-                    [
-                        SNew(STextBlock)
-                        .Text_Lambda([this]() -> FText {
-                            if (OwnerPlayer.IsValid())
-                            {
-                                return FText::FromString(FString::Printf(TEXT("포인트: %d"), OwnerPlayer->SkillPoints));
-                            }
-                            return FText::FromString(TEXT("포인트: 0"));
-                        })
-                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
-                    ]
-                    
-                    // 레벨 조정 버튼들 (가로로 배치)
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    .Padding(FMargin(0, 2))
-                    [
-                        SNew(SHorizontalBox)
-                        
-                        // 레벨다운 버튼
-                        + SHorizontalBox::Slot()
-                        .AutoWidth()
-                        .Padding(FMargin(2, 0))
-                        [
-                            SNew(SButton)
-                            .OnClicked(this, &STripodSystemWidget::OnLevelDownButtonClicked, i)
-                            .ContentPadding(FMargin(4, 2))
-                            .ButtonColorAndOpacity(FLinearColor(0.8f, 0.2f, 0.2f, 1.0f))
-                            .IsEnabled_Lambda([this, i]()-> bool
-                            {
-                                return OwnerPlayer.IsValid() && OwnerPlayer->Skills[i].SkillLevel > 1;
-                            })
+                            SNew(SBorder)
+                            .HAlign(HAlign_Center)
+                            .VAlign(VAlign_Center)
                             [
                                 SNew(STextBlock)
-                                .Text(FText::FromString(TEXT("-")))
-                                .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
-                            ]
-                        ]
-                        
-                        // 레벨업 버튼
-                        + SHorizontalBox::Slot()
-                        .AutoWidth()
-                        .Padding(FMargin(2, 0))
-                        [
-                            SNew(SButton)
-                            .OnClicked(this, &STripodSystemWidget::OnLevelUpButtonClicked, i)
-                            .ContentPadding(FMargin(4, 2))
-                            .ButtonColorAndOpacity(FLinearColor(0.2f, 0.6f, 0.2f, 1.0f))
-                            .IsEnabled_Lambda([this, i]() -> bool {
-                                return OwnerPlayer.IsValid() && OwnerPlayer->SkillPoints > 0;
-                            })
-                            [
-                                SNew(STextBlock)
-                                .Text(FText::FromString(TEXT("+")))
-                                .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+                                .Text(FText::FromString(Skill.SkillName.Left(1)))
                             ]
                         ]
                     ]
                 ]
-            ];
-        }
+                
+                // 스킬 이름
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .HAlign(HAlign_Center)
+                [
+                    SNew(STextBlock)
+                    .Text(FText::FromString(Skill.SkillName))
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
+                ]
+                
+                // 레벨 표시
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .HAlign(HAlign_Center)
+                [
+                    SNew(STextBlock)
+                    .Text(FText::FromString(FString::Printf(TEXT("Lv. %d"), Skill.SkillLevel)))
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
+                ]
+                
+                // 스킬 포인트 표시
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .HAlign(HAlign_Center)
+                .Padding(FMargin(0, 2))
+                [
+                    SNew(STextBlock)
+                    .Text_Lambda([this]() -> FText {
+                        if (OwnerPlayer.IsValid())
+                        {
+                            return FText::FromString(FString::Printf(TEXT("포인트: %d"), OwnerPlayer->SkillPoints));
+                        }
+                        return FText::FromString(TEXT("포인트: 0"));
+                    })
+                    .Font(FCoreStyle::GetDefaultFontStyle("Regular", 8))
+                ]
+                
+                // 레벨 조정 버튼들 (가로로 배치)
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                .HAlign(HAlign_Center)
+                .Padding(FMargin(0, 2))
+                [
+                    SNew(SHorizontalBox)
+                    
+                    // 레벨다운 버튼
+                    + SHorizontalBox::Slot()
+                    .AutoWidth()
+                    .Padding(FMargin(2, 0))
+                    [
+                        SNew(SButton)
+                        .OnClicked(this, &STripodSystemWidget::OnLevelDownButtonClicked, i)
+                        .ContentPadding(FMargin(4, 2))
+                        .ButtonColorAndOpacity(FLinearColor(0.8f, 0.2f, 0.2f, 1.0f))
+                        .IsEnabled_Lambda([this, i]()-> bool
+                        {
+                            return OwnerPlayer.IsValid() && OwnerPlayer->Skills[i].SkillLevel > 1;
+                        })
+                        [
+                            SNew(STextBlock)
+                            .Text(FText::FromString(TEXT("-")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+                        ]
+                    ]
+                    
+                    // 레벨업 버튼
+                    + SHorizontalBox::Slot()
+                    .AutoWidth()
+                    .Padding(FMargin(2, 0))
+                    [
+                        SNew(SButton)
+                        .OnClicked(this, &STripodSystemWidget::OnLevelUpButtonClicked, i)
+                        .ContentPadding(FMargin(4, 2))
+                        .ButtonColorAndOpacity(FLinearColor(0.2f, 0.6f, 0.2f, 1.0f))
+                        .IsEnabled_Lambda([this, i]() -> bool {
+                            return OwnerPlayer.IsValid() && OwnerPlayer->SkillPoints > 0;
+                        })
+                        [
+                            SNew(STextBlock)
+                            .Text(FText::FromString(TEXT("+")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))
+                        ]
+                    ]
+                ]
+            ]
+        ];
     }
-    
-    return SkillGrid;
+}
+
+void STripodSystemWidget::RefreshWidget()
+{
+    if (SkillGridWidget.IsValid())
+    {
+        // 스킬 목록 위젯 갱신
+        CreateSkillListWidget();
+    }
 }
 
 TSharedRef<SWidget> STripodSystemWidget::CreateTripodTierWidget(int32 SkillIndex, int32 TierIndex)
@@ -415,6 +432,9 @@ FReply STripodSystemWidget::OnLevelUpButtonClicked(int32 SkillIndex)
     if (OwnerPlayer.IsValid())
     {
         OwnerPlayer->LevelUpSkill(SkillIndex);
+        
+        // UI 갱신
+        RefreshWidget();
     }
     
     return FReply::Handled();
@@ -422,13 +442,15 @@ FReply STripodSystemWidget::OnLevelUpButtonClicked(int32 SkillIndex)
 
 FReply STripodSystemWidget::OnLevelDownButtonClicked(int32 SkillIndex)
 {
-    // 플레이어 유효성검증 && 스킬존재 && 스킬 레벨이 1보다 많은가 ?
-    if (OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(SkillIndex) &&
+    if (OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(SkillIndex) && 
         OwnerPlayer->Skills[SkillIndex].SkillLevel > 1)
     {
         OwnerPlayer->LevelDownSkill(SkillIndex);
+        
+        // UI 갱신
+        RefreshWidget();
     }
-
+    
     return FReply::Handled();
 }
 

@@ -45,6 +45,11 @@ void ATripodSystemHUD::ToggleTripodSystemUI()
     }
     else
     {
+        // UI 표시 전에 위젯 갱신
+        if (TripodSystemWidget.IsValid())
+        {
+            TripodSystemWidget->RefreshWidget();
+        }
         ShowTripodSystemUI();
     }
     
