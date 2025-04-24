@@ -166,7 +166,7 @@ TSharedRef<SWidget> STripodSystemWidget::CreateSkillListWidget()
             [
                 SNew(SBox)
                 .WidthOverride(80)
-                .HeightOverride(100)
+                .HeightOverride(120)  // 높이를 약간 늘림
                 [
                     SNew(SVerticalBox)
                     
@@ -212,6 +212,47 @@ TSharedRef<SWidget> STripodSystemWidget::CreateSkillListWidget()
                         SNew(STextBlock)
                         .Text(FText::FromString(FString::Printf(TEXT("Lv. %d"), Skill.SkillLevel)))
                         .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
+                    ]
+                    
+                    // 레벨업 버튼 추가
+                    + SVerticalBox::Slot()
+                    .AutoHeight()
+                    .HAlign(HAlign_Center)
+                    .Padding(FMargin(0, 2))
+                    [
+                        SNew(SButton)
+                        .OnClicked(this, &STripodSystemWidget::OnLevelUpButtonClicked, i)
+                        .ContentPadding(FMargin(4, 2))
+                        .ButtonColorAndOpacity(FLinearColor(0.2f, 0.6f, 0.2f, 1.0f))
+                        .IsEnabled_Lambda([this, i]() -> bool {
+                            return OwnerPlayer.IsValid() && OwnerPlayer->SkillPoints > 0;
+                        })
+                        [
+                            SNew(STextBlock)
+                            .Text(FText::FromString(TEXT("레벨업")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+                        ]
+                    ]
+
+                    // 감소 버튼 추가
+                    + SVerticalBox::Slot()
+                    .AutoHeight()
+                    .HAlign(HAlign_Center)
+                    .Padding(FMargin(0, 2))
+                    [
+                        SNew(SButton)
+                        .OnClicked(this, &STripodSystemWidget::OnLevelDownButtonClicked, i)
+                        .ContentPadding(FMargin(4, 2))
+                        .ButtonColorAndOpacity(FLinearColor(0.5f, 0.5f, 0.5f, 1.0f))
+                        .IsEnabled_Lambda([this, i]()-> bool
+                        {
+                            return OwnerPlayer.IsValid() && OwnerPlayer->Skills[i].SkillLevel > 1;
+                        })
+                        [
+                            SNew(STextBlock)
+                            .Text(FText::FromString(TEXT("레벨다운")))
+                            .Font(FCoreStyle::GetDefaultFontStyle("Regular", 9))
+                        ]
                     ]
                 ]
             ];
@@ -352,6 +393,16 @@ FReply STripodSystemWidget::OnLevelUpButtonClicked(int32 SkillIndex)
         OwnerPlayer->LevelUpSkill(SkillIndex);
     }
     
+    return FReply::Handled();
+}
+
+FReply STripodSystemWidget::OnLevelDownButtonClicked(int32 SkillIndex)
+{
+    if (OwnerPlayer.IsValid())
+    {
+        OwnerPlayer->LevelDownSkill(SkillIndex);
+    }
+
     return FReply::Handled();
 }
 

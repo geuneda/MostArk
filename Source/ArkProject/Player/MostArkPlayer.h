@@ -144,10 +144,12 @@ public:
     // 스킬 레벨업 함수
     UFUNCTION(BlueprintCallable, Category = "Skill")
     void LevelUpSkill(int32 SkillIndex);
+    void LevelDownSkill(int32 SkillIndex);
 
     // 트라이포드 해금 확인 함수
     UFUNCTION(BlueprintCallable, Category = "Tripod")
     void CheckTripodUnlock(int32 SkillIndex);
+    void CheckTripodlock(int32 SkillIndex);
 
     // 스킬 목록
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skills")

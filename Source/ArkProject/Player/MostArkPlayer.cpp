@@ -346,6 +346,22 @@ void AMostArkPlayer::LevelUpSkill(int32 SkillIndex)
     }
 }
 
+// 스킬 레벨다운 함수
+void AMostArkPlayer::LevelDownSkill(int32 SkillIndex)
+{
+    if (Skills.IsValidIndex(SkillIndex) && SkillPoints < 0)
+    {
+        // 스킬 레벨 감소
+        Skills[SkillIndex].SkillLevel--;
+        SkillPoints++;
+
+        UE_LOG(LogTemp, Display, TEXT("스킬 레벨감소: %s (레벨 %d)"),
+            *Skills[SkillIndex].SkillName, Skills[SkillIndex].SkillLevel);
+
+        CheckTripodUnlock(SkillIndex);
+    }
+}
+
 // 트라이포드 해금 확인 함수
 void AMostArkPlayer::CheckTripodUnlock(int32 SkillIndex)
 {
@@ -371,6 +387,15 @@ void AMostArkPlayer::CheckTripodUnlock(int32 SkillIndex)
         {
             Skills[SkillIndex].TripodTiers[2].bIsUnlocked = true;
         }
+    }
+}
+
+// 트라이포드 잠금 확인 함수
+void AMostArkPlayer::CheckTripodlock(int32 SkillIndex)
+{
+    if (Skills.IsValidIndex(SkillIndex))
+    {
+        //TODO:: 트라이포드 잠금 분기 확인
     }
 }
 

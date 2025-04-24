@@ -41,4 +41,7 @@ private:
 
     /** 레벨업 버튼 클릭 콜백 */
     FReply OnLevelUpButtonClicked(int32 SkillIndex);
+
+    /** 레벨다운 버튼 클릭 콜백 */
+    FReply OnLevelDownButtonClicked(int32 SkillIndex);
 };
