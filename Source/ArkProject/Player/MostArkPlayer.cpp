@@ -13,22 +13,39 @@ AMostArkPlayer::AMostArkPlayer()
 {
     PrimaryActorTick.bCanEverTick = true;
 
-    // 기본값 설정
+    FSkillData ShockSkill;
+    ShockSkill.SkillName = TEXT("충격파");
+    ShockSkill.SkillLevel = 1;
+    Skills.Add(ShockSkill);
+    
+    FSkillData BladeStormSkill;
+    BladeStormSkill.SkillName = TEXT("블레이드 스톰");
+    BladeStormSkill.SkillLevel = 1;
+    Skills.Add(BladeStormSkill);
+    
+    FSkillData WindBladeSkill;
+    WindBladeSkill.SkillName = TEXT("윈드 블레이드");
+    WindBladeSkill.SkillLevel = 1;
+    Skills.Add(WindBladeSkill);
+    
+    // 기본 선택 스킬 설정
     SelectedSkillIndex = 0;
-    SkillPoints = 20; // 스킬 포인트 초기값 설정
-
-    // 예시 스킬 생성
-    FSkillData Skill1;
-    Skill1.SkillName = TEXT("충격파");
-    Skills.Add(Skill1);
-
-    FSkillData Skill2;
-    Skill2.SkillName = TEXT("블레이드 스톰");
-    Skills.Add(Skill2);
-
-    FSkillData Skill3;
-    Skill3.SkillName = TEXT("윈드 블레이드");
-    Skills.Add(Skill3);
+    
+    // 초기 스킬 포인트 설정
+    SkillPoints = 30;
+    
+    // 트라이포드 효과 초기화 (필수!)
+    for (int32 SkillIndex = 0; SkillIndex < Skills.Num(); ++SkillIndex)
+    {
+        FSkillData& Skill = Skills[SkillIndex];
+        
+        // 각 티어별로 트라이포드 효과 초기화
+        for (int32 TierIndex = 0; TierIndex < Skill.TripodTiers.Num(); ++TierIndex)
+        {
+            FTripodTier& Tier = Skill.TripodTiers[TierIndex];
+            Tier.TripodEffects.SetNum(3); // 각 티어마다 3개의 효과 추가
+        }
+    }
 
     // Set size for player capsule
     GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -64,14 +81,17 @@ void AMostArkPlayer::BeginPlay()
 {
     Super::BeginPlay();
     
-    // 예시 트라이포드 효과 설정
+    
+    // 트라이포드 효과 설정 - 반드시 스킬 초기화 후에 호출
     SetupTripodEffects();
     
-    // 초기 스킬 설정
+    // 초기 트라이포드 해금 상태 설정
     for (int32 i = 0; i < Skills.Num(); ++i)
     {
         CheckTripodUnlock(i);
     }
+    
+    UE_LOG(LogTemp, Warning, TEXT("MostArkPlayer BeginPlay 완료"));
 }
 
 void AMostArkPlayer::Tick(float DeltaTime)
@@ -332,15 +352,15 @@ void AMostArkPlayer::LevelUpSkill(int32 SkillIndex)
 {
     if (Skills.IsValidIndex(SkillIndex) && SkillPoints > 0)
     {
-        // 스킬 레벨 증가
-        Skills[SkillIndex].SkillLevel++;
+        FSkillData& Skill = Skills[SkillIndex];
+        Skill.SkillLevel++;
         SkillPoints--;
         
-        UE_LOG(LogTemp, Display, TEXT("스킬 레벨업: %s (레벨 %d)"), 
-            *Skills[SkillIndex].SkillName, Skills[SkillIndex].SkillLevel);
-        
-        // 트라이포드 잠금 해제 여부 확인
+        // 트라이포드 해금 상태 업데이트
         CheckTripodUnlock(SkillIndex);
+        
+        UE_LOG(LogTemp, Display, TEXT("스킬 레벨업: %s (레벨 %d)"), *Skill.SkillName, Skill.SkillLevel);
+        
     }
 }
 
@@ -363,30 +383,41 @@ void AMostArkPlayer::LevelDownSkill(int32 SkillIndex)
 // 트라이포드 해금 확인 함수
 void AMostArkPlayer::CheckTripodUnlock(int32 SkillIndex)
 {
-    if (Skills.IsValidIndex(SkillIndex))
+    if (!Skills.IsValidIndex(SkillIndex))
+        return;
+
+    FSkillData& Skill = Skills[SkillIndex];
+    int32 SkillLevel = Skill.SkillLevel;
+
+    // 각 티어별 해금 조건 설정
+    for (int32 TierIndex = 0; TierIndex < Skill.TripodTiers.Num(); ++TierIndex)
     {
-        // 스킬 레벨에 따라 트라이포드 티어 해금
-        int32 SkillLevel = Skills[SkillIndex].SkillLevel;
+        FTripodTier& Tier = Skill.TripodTiers[TierIndex];
         
-        // 1단계 트라이포드: 스킬 레벨 4 이상
-        if (SkillLevel >= 1 && Skills[SkillIndex].TripodTiers.IsValidIndex(0))
+        // 레벨에 따른 트라이포드 티어 해금
+        bool bShouldUnlock = false;
+        
+        switch (TierIndex)
         {
-            Skills[SkillIndex].TripodTiers[0].bIsUnlocked = true;
+            case 0: // 1단계 트라이포드 (레벨 4 이상)
+                bShouldUnlock = (SkillLevel >= 4);
+                break;
+            case 1: // 2단계 트라이포드 (레벨 7 이상)
+                bShouldUnlock = (SkillLevel >= 7);
+                break;
+            case 2: // 3단계 트라이포드 (레벨 10 이상)
+                bShouldUnlock = (SkillLevel >= 10);
+                break;
         }
         
-        // 2단계 트라이포드: 스킬 레벨 7 이상
-        if (SkillLevel >= 7 && Skills[SkillIndex].TripodTiers.IsValidIndex(1))
-        {
-            Skills[SkillIndex].TripodTiers[1].bIsUnlocked = true;
-        }
+        Tier.bIsUnlocked = bShouldUnlock;
         
-        // 3단계 트라이포드: 스킬 레벨 10 이상
-        if (SkillLevel >= 10 && Skills[SkillIndex].TripodTiers.IsValidIndex(2))
-        {
-            Skills[SkillIndex].TripodTiers[2].bIsUnlocked = true;
-        }
+        // 디버그 출력
+        UE_LOG(LogTemp, Display, TEXT("스킬 [%s] 티어 %d 해금 상태: %s (현재 레벨: %d)"),
+            *Skill.SkillName, TierIndex + 1, bShouldUnlock ? TEXT("해금됨") : TEXT("잠김"), SkillLevel);
     }
 }
+
 
 // 트라이포드 잠금 확인 함수
 void AMostArkPlayer::CheckTripodlock(int32 SkillIndex)
@@ -597,189 +628,132 @@ void AMostArkPlayer::ToggleTripodSystemUI()
 // 트라이포드 효과 설정 함수 추가
 void AMostArkPlayer::SetupTripodEffects()
 {
-    // 스킬 1: 충격파
-    if (Skills.IsValidIndex(0))
+    UE_LOG(LogTemp, Display, TEXT("트라이포드 효과 설정 시작"));
+    
+    // 각 스킬별로 트라이포드 효과 설정
+    for (int32 SkillIndex = 0; SkillIndex < Skills.Num(); ++SkillIndex)
     {
-        // 1단계 트라이포드
-        if (Skills[0].TripodTiers.IsValidIndex(0))
-        {
-            FTripodTier& Tier1 = Skills[0].TripodTiers[0];
-            
-            // 효과 1: 강화된 충격
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("강화된 충격");
-            Effect1.Description = TEXT("충격파의 데미지가 30% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 넓은 범위
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("넓은 범위");
-            Effect2.Description = TEXT("충격파의 범위가 20% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect2);
-            
-            // 효과 3: 빠른 충전
-            FTripodEffect Effect3;
-            Effect3.EffectName = TEXT("빠른 충전");
-            Effect3.Description = TEXT("충격파의 쿨다운이 15% 감소합니다.");
-            Tier1.TripodEffects.Add(Effect3);
-        }
+        FSkillData& Skill = Skills[SkillIndex];
         
-        // 2단계 트라이포드
-        if (Skills[0].TripodTiers.IsValidIndex(1))
+        // 각 티어별로 트라이포드 효과 설정
+        for (int32 TierIndex = 0; TierIndex < Skill.TripodTiers.Num(); ++TierIndex)
         {
-            FTripodTier& Tier2 = Skills[0].TripodTiers[1];
+            FTripodTier& Tier = Skill.TripodTiers[TierIndex];
             
-            // 효과 1: 연속 충격
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("연속 충격");
-            Effect1.Description = TEXT("충격파가 2회 연속 발동됩니다.");
-            Tier2.TripodEffects.Add(Effect1);
+            // 각 티어마다 3개의 효과 추가
+            Tier.TripodEffects.SetNum(3);
             
-            // 효과 2: 충격 침투
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("충격 침투");
-            Effect2.Description = TEXT("적의 방어력을 20% 무시합니다.");
-            Tier2.TripodEffects.Add(Effect2);
-        }
-        
-        // 3단계 트라이포드
-        if (Skills[0].TripodTiers.IsValidIndex(2))
-        {
-            FTripodTier& Tier3 = Skills[0].TripodTiers[2];
-            
-            // 효과 1: 파괴적인 충격
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("파괴적인 충격");
-            Effect1.Description = TEXT("충격파가 적중하면 주변에 2차 폭발이 발생합니다.");
-            Tier3.TripodEffects.Add(Effect1);
+            // 스킬별로 다른 트라이포드 효과 설정
+            if (Skill.SkillName.Equals(TEXT("충격파")))
+            {
+                if (TierIndex == 0) // 1단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("강화된 충격");
+                    Tier.TripodEffects[0].Description = TEXT("충격파의 데미지가 30% 증가합니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("넓은 범위");
+                    Tier.TripodEffects[1].Description = TEXT("충격파의 범위가 20% 증가합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 충전");
+                    Tier.TripodEffects[2].Description = TEXT("충격파의 쿨다운이 15% 감소합니다.");
+                }
+                else if (TierIndex == 1) // 2단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("연속 충격");
+                    Tier.TripodEffects[0].Description = TEXT("충격파가 한 번 더 발사됩니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("충격 침투");
+                    Tier.TripodEffects[1].Description = TEXT("충격파가 적의 방어력을 20% 무시합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 시전");
+                    Tier.TripodEffects[2].Description = TEXT("시전 속도가 30% 증가합니다.");
+                }
+                else if (TierIndex == 2) // 3단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("파괴적인 충격");
+                    Tier.TripodEffects[0].Description = TEXT("충격파가 적중하면 주변에 2차 폭발을 일으킵니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("전기 충격");
+                    Tier.TripodEffects[1].Description = TEXT("충격파에 전기 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("멀티 충격");
+                    Tier.TripodEffects[2].Description = TEXT("충격파가 여러 개로 나뉘어 발사됩니다.");
+                }
+            }
+            else if (Skill.SkillName.Equals(TEXT("블레이드 스톰")))
+            {
+                if (TierIndex == 0) // 1단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("강화된 블레이드");
+                    Tier.TripodEffects[0].Description = TEXT("블레이드 스톰의 데미지가 25% 증가합니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("지속 시간 증가");
+                    Tier.TripodEffects[1].Description = TEXT("블레이드 스톰의 지속 시간이 30% 증가합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("무기 강화");
+                    Tier.TripodEffects[2].Description = TEXT("사용 후 10초간 공격력이 15% 증가합니다.");
+                }
+                else if (TierIndex == 1) // 2단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("화염 블레이드");
+                    Tier.TripodEffects[0].Description = TEXT("블레이드가 화염 속성을 가지며 화상 효과를 줍니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("회복의 칼날");
+                    Tier.TripodEffects[1].Description = TEXT("적중한 적 1명당 최대 체력의 1%를 회복합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("소용돌이 증가");
+                    Tier.TripodEffects[2].Description = TEXT("블레이드 스톰의 회전 속도가 증가하여 타격 횟수가 늘어납니다.");
+                }
+                else if (TierIndex == 2) // 3단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("블레이드 춤");
+                    Tier.TripodEffects[0].Description = TEXT("블레이드 스톰 종료 후 전방으로 도약하며 강력한 일격을 가합니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("죽음의 소용돌이");
+                    Tier.TripodEffects[1].Description = TEXT("블레이드 스톰의 크기가 50% 증가하고 중심부에서 더 강한 데미지를 입힙니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("블레이드 폭풍");
+                    Tier.TripodEffects[2].Description = TEXT("블레이드 스톰에서 칼날이 튀어나가 주변 적을 추가로 공격합니다.");
+                }
+            }
+            else if (Skill.SkillName.Equals(TEXT("윈드 블레이드")))
+            {
+                if (TierIndex == 0) // 1단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("관통 바람");
+                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 적을 관통합니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("빠른 발사");
+                    Tier.TripodEffects[1].Description = TEXT("시전 속도가 30% 증가합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("예리한 칼날");
+                    Tier.TripodEffects[2].Description = TEXT("크리티컬 확률이 15% 증가합니다.");
+                }
+                else if (TierIndex == 1) // 2단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("빙결 칼날");
+                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 얼음 속성을 가지며 적의 이동 속도를 감소시킵니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("연속 발사");
+                    Tier.TripodEffects[1].Description = TEXT("윈드 블레이드를 연속해서 2번 발사합니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("정신 집중");
+                    Tier.TripodEffects[2].Description = TEXT("치명타 데미지가 30% 증가합니다.");
+                }
+                else if (TierIndex == 2) // 3단계 트라이포드
+                {
+                    Tier.TripodEffects[0].EffectName = TEXT("회오리 칼날");
+                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 회오리 형태로 발사되어 주변 적들을 끌어당깁니다.");
+                    
+                    Tier.TripodEffects[1].EffectName = TEXT("제압 바람");
+                    Tier.TripodEffects[1].Description = TEXT("적중된 적이 3초간 기절 상태가 됩니다.");
+                    
+                    Tier.TripodEffects[2].EffectName = TEXT("선풍 칼날");
+                    Tier.TripodEffects[2].Description = TEXT("윈드 블레이드 발사 후 바람 기운이 폭발하여 주변에 추가 데미지를 입힙니다.");
+                }
+            }
         }
     }
     
-    // 스킬 2: 블레이드 스톰
-    if (Skills.IsValidIndex(1))
-    {
-        // 1단계 트라이포드
-        if (Skills[1].TripodTiers.IsValidIndex(0))
-        {
-            FTripodTier& Tier1 = Skills[1].TripodTiers[0];
-            
-            // 효과 1: 강화된 블레이드
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("강화된 블레이드");
-            Effect1.Description = TEXT("블레이드 스톰의 데미지가 25% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 지속 시간 증가
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("지속 시간 증가");
-            Effect2.Description = TEXT("블레이드 스톰의 지속 시간이 30% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect2);
-            
-            // 효과 3: 무기 강화
-            FTripodEffect Effect3;
-            Effect3.EffectName = TEXT("무기 강화");
-            Effect3.Description = TEXT("블레이드 스톰 사용 후 10초간 공격력이 15% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect3);
-        }
-
-        // 2단계 트라이포드
-        if (Skills[1].TripodTiers.IsValidIndex(1))
-        {
-            FTripodTier& Tier2 = Skills[1].TripodTiers[1];
-            
-            // 효과 1: 화염 블레이드
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("화염 블레이드");
-            Effect1.Description = TEXT("블레이드가 화염 속성을 가지며 3초간 화상 효과를 줍니다.");
-            Tier2.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 회복의 칼날
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("회복의 칼날");
-            Effect2.Description = TEXT("적중한 적 1명당 최대 체력의 1%를 회복합니다.");
-            Tier2.TripodEffects.Add(Effect2);
-        }
-        
-        // 3단계 트라이포드
-        if (Skills[1].TripodTiers.IsValidIndex(2))
-        {
-            FTripodTier& Tier3 = Skills[1].TripodTiers[2];
-            
-            // 효과 1: 블레이드 춤
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("블레이드 춤");
-            Effect1.Description = TEXT("블레이드 스톰 종료 후 전방으로 도약하며 강력한 일격을 가합니다.");
-            Tier3.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 죽음의 소용돌이
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("죽음의 소용돌이");
-            Effect2.Description = TEXT("블레이드 스톰의 크기가 50% 증가하고 중심부에서 더 강한 데미지를 입힙니다.");
-            Tier3.TripodEffects.Add(Effect2);
-        }
-    }
-    
-    // 스킬 3: 윈드 블레이드
-    if (Skills.IsValidIndex(2))
-    {
-        // 1단계 트라이포드
-        if (Skills[2].TripodTiers.IsValidIndex(0))
-        {
-            FTripodTier& Tier1 = Skills[2].TripodTiers[0];
-            
-            // 효과 1: 관통 바람
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("관통 바람");
-            Effect1.Description = TEXT("바람 칼날이 적을 관통합니다.");
-            Tier1.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 빠른 발사
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("빠른 발사");
-            Effect2.Description = TEXT("시전 속도가 30% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect2);
-            
-            // 효과 3: 예리한 칼날
-            FTripodEffect Effect3;
-            Effect3.EffectName = TEXT("예리한 칼날");
-            Effect3.Description = TEXT("크리티컬 확률이 15% 증가합니다.");
-            Tier1.TripodEffects.Add(Effect3);
-        }
-        
-        // 2단계 트라이포드
-        if (Skills[2].TripodTiers.IsValidIndex(1))
-        {
-            FTripodTier& Tier2 = Skills[2].TripodTiers[1];
-            
-            // 효과 1: 바람의 축복
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("바람의 축복");
-            Effect1.Description = TEXT("5초간 이동 속도가 15% 증가합니다.");
-            Tier2.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 삼중 칼날
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("삼중 칼날");
-            Effect2.Description = TEXT("바람 칼날이 3개로 분열됩니다.");
-            Tier2.TripodEffects.Add(Effect2);
-        }
-        
-        // 3단계 트라이포드
-        if (Skills[2].TripodTiers.IsValidIndex(2))
-        {
-            FTripodTier& Tier3 = Skills[2].TripodTiers[2];
-            
-            // 효과 1: 태풍의 힘
-            FTripodEffect Effect1;
-            Effect1.EffectName = TEXT("태풍의 힘");
-            Effect1.Description = TEXT("바람 칼날이 적중 지점에 소형 토네이도를 생성합니다.");
-            Tier3.TripodEffects.Add(Effect1);
-            
-            // 효과 2: 바람의 파괴자
-            FTripodEffect Effect2;
-            Effect2.EffectName = TEXT("바람의 파괴자");
-            Effect2.Description = TEXT("데미지가 80% 증가하지만 쿨다운이 50% 증가합니다.");
-            Tier3.TripodEffects.Add(Effect2);
-        }
-    }
+    UE_LOG(LogTemp, Display, TEXT("트라이포드 효과 설정 완료"));
 }

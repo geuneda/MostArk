@@ -98,7 +98,9 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
                         [
                             SNew(SBox)
                             [
-                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 0)
+                                OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(OwnerPlayer->SelectedSkillIndex) ? 
+                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 0) :
+                                SNew(STextBlock).Text(FText::FromString(TEXT("데이터 로딩 중...")))
                             ]
                         ]
                     ]
@@ -121,7 +123,9 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
                         [
                             SNew(SBox)
                             [
-                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 1)
+                                OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(OwnerPlayer->SelectedSkillIndex) ? 
+                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 1) :
+                                SNew(STextBlock).Text(FText::FromString(TEXT("데이터 로딩 중...")))
                             ]
                         ]
                     ]
@@ -144,7 +148,9 @@ void STripodSystemWidget::Construct(const FArguments& InArgs)
                         [
                             SNew(SBox)
                             [
-                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 2)
+                                OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(OwnerPlayer->SelectedSkillIndex) ? 
+                                CreateTripodTierWidget(OwnerPlayer->SelectedSkillIndex, 2) :
+                                SNew(STextBlock).Text(FText::FromString(TEXT("데이터 로딩 중...")))
                             ]
                         ]
                     ]
@@ -296,126 +302,163 @@ void STripodSystemWidget::CreateSkillListWidget()
 
 void STripodSystemWidget::RefreshWidget()
 {
+    UE_LOG(LogTemp, Warning, TEXT("STripodSystemWidget::RefreshWidget 호출됨"));
+    
     if (SkillGridWidget.IsValid())
     {
         // 스킬 목록 위젯 갱신
         CreateSkillListWidget();
+        
+        if (OwnerPlayer.IsValid())
+        {
+            this->SetRenderOpacity(0.99f);
+            this->SetRenderOpacity(1.0f);
+        }
     }
 }
 
 TSharedRef<SWidget> STripodSystemWidget::CreateTripodTierWidget(int32 SkillIndex, int32 TierIndex)
 {
-    TSharedRef<SHorizontalBox> TierBox = SNew(SHorizontalBox);
+    // 유효성 검사 추가
     
-    if (OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(SkillIndex) && 
-        OwnerPlayer->Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex))
+    if (!OwnerPlayer.IsValid() || !OwnerPlayer->Skills.IsValidIndex(SkillIndex) || 
+        !OwnerPlayer->Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex))
     {
-        FTripodTier& Tier = OwnerPlayer->Skills[SkillIndex].TripodTiers[TierIndex];
-        
-        // 티어가 잠겨있는 경우 잠금 표시
-        if (!Tier.bIsUnlocked)
-        {
-            int32 unlockLevel = TierIndex == 0 ? 4 : (TierIndex == 1 ? 7 : 10);
-            TierBox->AddSlot()
-            .AutoWidth()
-            .HAlign(HAlign_Center)
-            .VAlign(VAlign_Center)
+        return SNew(SBox)
             [
                 SNew(STextBlock)
-                .Text(FText::FromString(FString::Printf(TEXT("스킬 레벨 %d에 해제됩니다."), unlockLevel)))
-                .Font(FCoreStyle::GetDefaultFontStyle("Italic", 12))
+                .Text(FText::FromString(TEXT("데이터가 없습니다")))
+                .ColorAndOpacity(FSlateColor(FLinearColor::Gray))
             ];
-        }
-        else
-        {
-            // 해당 티어의 각 효과 표시
-            for (int32 i = 0; i < Tier.TripodEffects.Num(); ++i)
-            {
-                TierBox->AddSlot()
-                .AutoWidth()
-                .Padding(5, 0)
-                [
-                    CreateTripodEffectWidget(SkillIndex, TierIndex, i)
-                ];
-            }
-        }
     }
+
+    const FSkillData& Skill = OwnerPlayer->Skills[SkillIndex];
+    const FTripodTier& Tier = Skill.TripodTiers[TierIndex];
     
-    return TierBox;
+    // 트라이포드 티어의 활성화 여부에 따른 색상 변화
+    FSlateColor TierColor = Tier.bIsUnlocked ? 
+        FSlateColor(FLinearColor::White) : 
+        FSlateColor(FLinearColor::Gray);
+    
+    return SNew(SVerticalBox)
+        + SVerticalBox::Slot()
+        .AutoHeight()
+        [
+            SNew(STextBlock)
+            .Text(FText::FromString(FString::Printf(TEXT("Tier %d"), TierIndex + 1)))
+            .ColorAndOpacity(TierColor)
+        ]
+        // 트라이포드 효과들을 여기에 추가
+        + SVerticalBox::Slot()
+        .AutoHeight()
+        [
+            SNew(SHorizontalBox)
+            + SHorizontalBox::Slot()
+            [
+                CreateTripodEffectWidget(SkillIndex, TierIndex, 0)
+            ]
+            + SHorizontalBox::Slot()
+            [
+                CreateTripodEffectWidget(SkillIndex, TierIndex, 1)
+            ]
+            + SHorizontalBox::Slot()
+            [
+                CreateTripodEffectWidget(SkillIndex, TierIndex, 2)
+            ]
+        ];
 }
 
 TSharedRef<SWidget> STripodSystemWidget::CreateTripodEffectWidget(int32 SkillIndex, int32 TierIndex, int32 EffectIndex)
 {
-    if (OwnerPlayer.IsValid() && 
-        OwnerPlayer->Skills.IsValidIndex(SkillIndex) &&
-        OwnerPlayer->Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex) &&
-        OwnerPlayer->Skills[SkillIndex].TripodTiers[TierIndex].TripodEffects.IsValidIndex(EffectIndex))
+    // 유효성 검사 강화
+    if (!OwnerPlayer.IsValid() || !OwnerPlayer->Skills.IsValidIndex(SkillIndex) || 
+        !OwnerPlayer->Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex) ||
+        EffectIndex >= OwnerPlayer->Skills[SkillIndex].TripodTiers[TierIndex].TripodEffects.Num())
     {
-        FTripodEffect& Effect = OwnerPlayer->Skills[SkillIndex].TripodTiers[TierIndex].TripodEffects[EffectIndex];
-        bool bIsSelected = OwnerPlayer->Skills[SkillIndex].TripodTiers[TierIndex].SelectedEffectIndex == EffectIndex;
-        
+        // 기본 더미 위젯 반환
         return SNew(SBox)
-        .WidthOverride(80)
-        .HeightOverride(100)
-        [
-            SNew(SButton)
-            .OnClicked(this, &STripodSystemWidget::OnTripodEffectSelected, SkillIndex, TierIndex, EffectIndex)
+            .WidthOverride(64)
+            .HeightOverride(64)
             [
                 SNew(SBorder)
-                .BorderImage(FCoreStyle::Get().GetBrush(bIsSelected ? "Button.Pressed" : "Button.Normal"))
-                .Padding(FMargin(4.0f))
+                .HAlign(HAlign_Center)
+                .VAlign(VAlign_Center)
                 [
-                    SNew(SVerticalBox)
-                    
-                    // 효과 아이콘
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    [
-                        SNew(SBox)
-                        .WidthOverride(60)
-                        .HeightOverride(60)
-                        [
-                            SNew(SBorder)
-                            .BorderImage(FCoreStyle::Get().GetBrush("ToolPanel.GroupBorder"))
-                            .HAlign(HAlign_Center)
-                            .VAlign(VAlign_Center)
-                            [
-                                SNew(STextBlock)
-                                .Text(FText::FromString(TEXT("효과")))
-                            ]
-                        ]
-                    ]
-                    
-                    // 효과 이름
-                    + SVerticalBox::Slot()
-                    .AutoHeight()
-                    .HAlign(HAlign_Center)
-                    [
-                        SNew(STextBlock)
-                        .Text(FText::FromString(Effect.EffectName))
-                        .Font(FCoreStyle::GetDefaultFontStyle("Regular", 10))
-                    ]
+                    SNew(STextBlock)
+                    .Text(FText::FromString(TEXT("---")))
+                    .ColorAndOpacity(FSlateColor(FLinearColor::Gray))
                 ]
+            ];
+    }
+
+    const FSkillData& Skill = OwnerPlayer->Skills[SkillIndex];
+    const FTripodTier& Tier = Skill.TripodTiers[TierIndex];
+    
+    // 해금되지 않은 경우 비활성화된 상태로 표시
+    bool bIsEnabled = Tier.bIsUnlocked;
+    FSlateColor EffectColor = bIsEnabled ? 
+        FSlateColor(FLinearColor::White) : 
+        FSlateColor(FLinearColor::Gray);
+
+    // TripodEffects 배열에 해당 인덱스가 있는지 확인
+    if (!Tier.TripodEffects.IsValidIndex(EffectIndex))
+    {
+        // 비어있는 효과 표시
+        return SNew(SButton)
+            .IsEnabled(false)
+            [
+                SNew(SVerticalBox)
+                + SVerticalBox::Slot()
+                .AutoHeight()
+                [
+                    SNew(STextBlock)
+                    .Text(FText::FromString(TEXT("비어있음")))
+                    .ColorAndOpacity(FSlateColor(FLinearColor::Gray))
+                ]
+            ];
+    }
+
+    const FTripodEffect& Effect = Tier.TripodEffects[EffectIndex];
+    
+    return SNew(SButton)
+        .OnClicked(this, &STripodSystemWidget::OnTripodEffectSelected, SkillIndex, TierIndex, EffectIndex)
+        .IsEnabled(bIsEnabled)
+        [
+            SNew(SVerticalBox)
+            + SVerticalBox::Slot()
+            .AutoHeight()
+            [
+                SNew(STextBlock)
+                .Text(FText::FromString(Effect.EffectName))
+                .ColorAndOpacity(EffectColor)
+            ]
+            + SVerticalBox::Slot()
+            .AutoHeight()
+            [
+                SNew(STextBlock)
+                .Text(FText::FromString(Effect.Description))
+                .ColorAndOpacity(EffectColor)
             ]
         ];
-    }
-    
-    // 효과가 없는 경우 빈 위젯 반환
-    return SNew(SBox)
-    .WidthOverride(80)
-    .HeightOverride(100);
 }
 
 FReply STripodSystemWidget::OnSkillSelected(int32 SkillIndex)
 {
     if (OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(SkillIndex))
     {
+        UE_LOG(LogTemp, Warning, TEXT("스킬 선택: 인덱스 %d, 이름: %s"), 
+               SkillIndex, *OwnerPlayer->Skills[SkillIndex].SkillName);
+        
+        // 선택된 스킬 인덱스 설정
         OwnerPlayer->SelectedSkillIndex = SkillIndex;
+        
+        this->SetRenderOpacity(0.99f);
+        this->SetRenderOpacity(1.0f);
     }
     
     return FReply::Handled();
 }
+
 
 FReply STripodSystemWidget::OnTripodEffectSelected(int32 SkillIndex, int32 TierIndex, int32 EffectIndex)
 {
@@ -431,6 +474,9 @@ FReply STripodSystemWidget::OnLevelUpButtonClicked(int32 SkillIndex)
 {
     if (OwnerPlayer.IsValid())
     {
+        UE_LOG(LogTemp, Warning, TEXT("레벨업 버튼 클릭: 스킬 인덱스 %d"), SkillIndex);
+        
+        // 스킬 레벨업
         OwnerPlayer->LevelUpSkill(SkillIndex);
         
         // UI 갱신
@@ -445,6 +491,9 @@ FReply STripodSystemWidget::OnLevelDownButtonClicked(int32 SkillIndex)
     if (OwnerPlayer.IsValid() && OwnerPlayer->Skills.IsValidIndex(SkillIndex) && 
         OwnerPlayer->Skills[SkillIndex].SkillLevel > 1)
     {
+        UE_LOG(LogTemp, Warning, TEXT("레벨다운 버튼 클릭: 스킬 인덱스 %d"), SkillIndex);
+        
+        // 스킬 레벨다운
         OwnerPlayer->LevelDownSkill(SkillIndex);
         
         // UI 갱신
