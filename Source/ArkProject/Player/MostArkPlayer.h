@@ -167,6 +167,34 @@ public:
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ToggleTripodSystemUI();
 
+    // 파티클 시스템 컴포넌트
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+    class UParticleSystem* ShockWaveEffect;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+    class UParticleSystem* BladeStormEffect;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+    class UParticleSystem* WindBladeEffect;
+    
+    // 개별 스킬 사용 함수 (키 바인딩용)
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    void UseSkill1();
+    
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    void UseSkill2();
+    
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    void UseSkill3();
+    
+    // 스킬 쿨다운 체크 함수
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    bool IsSkillOnCooldown(int32 SkillIndex) const;
+    
+    // 스킬 쿨다운 리셋 함수
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    void ResetSkillCooldown(int32 SkillIndex);
+
     /** Returns TopDownCameraComponent subobject **/
     FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
     /** Returns CameraBoom subobject **/
@@ -189,4 +217,36 @@ private:
 
     // 트라이포드 효과 설정 함수
     void SetupTripodEffects();
+    
+    // 스킬 쿨다운 타이머 핸들 배열
+    TArray<FTimerHandle> SkillCooldownTimers;
+    
+    // 스킬 사용 가능 여부 배열
+    TArray<bool> bSkillAvailable;
+    
+    // 쿨다운 완료 콜백 함수
+    void OnSkillCooldownComplete(int32 SkillIndex);
+    
+    // 특수 효과 변수
+    bool bHasSpeedBuff;
+    float OriginalMovementSpeed;
+    FTimerHandle SpeedBuffTimer;
+    
+    FTimerHandle BurnEffectTimer;
+    int32 BurnEffectCount;
+    
+    bool bHasAttackBuff;
+    float OriginalDamageMultiplier;
+    FTimerHandle AttackBuffTimer;
+    
+    // 특수 효과 적용 함수
+    void ApplySpeedBuff(float Duration, float Multiplier);
+    void RemoveSpeedBuff();
+    
+    void ApplyBurnEffect(float Duration, float DamagePerTick);
+    void ApplyBurnEffectTick(float DamagePerTick);
+    void RemoveBurnEffect();
+    
+    void ApplyAttackBuff(float Duration, float Multiplier);
+    void RemoveAttackBuff();
 };
