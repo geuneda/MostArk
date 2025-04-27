@@ -14,21 +14,27 @@ class ARKPROJECT_API STripodSystemWidget : public SCompoundWidget
 public:
     SLATE_BEGIN_ARGS(STripodSystemWidget)
         : _OwnerPlayer(nullptr)
-    {}
-        SLATE_ARGUMENT(AMostArkPlayer*, OwnerPlayer)
+    {
+    }
+    SLATE_ARGUMENT(AMostArkPlayer *, OwnerPlayer)
     SLATE_END_ARGS()
 
-    void Construct(const FArguments& InArgs);
-    
+    void Construct(const FArguments &InArgs);
+
     /** UI 갱신 메서드 */
     void RefreshWidget();
 
 private:
     /** 플레이어 */
     TWeakObjectPtr<AMostArkPlayer> OwnerPlayer;
-    
+
     /** 스킬 그리드 위젯 */
     TSharedPtr<class SGridPanel> SkillGridWidget;
+
+    /** 각 티어별 트라이포드 슬롯 위젯 */
+    TSharedPtr<class SBox> Tripod1Slot;
+    TSharedPtr<class SBox> Tripod2Slot;
+    TSharedPtr<class SBox> Tripod3Slot;
 
     /** 스킬 목록 위젯 생성 */
     void CreateSkillListWidget();

@@ -162,10 +162,11 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation());
         }
 
-        // 트라이포드에 따른 특수 효과
+        // 트라이포드에 따른 특수 효과 - 티어별로 선택된 효과만 적용
         // 1단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(0) && Skill.TripodTiers[0].bIsUnlocked &&
-            Skill.TripodTiers[0].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[0].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[0].TripodEffects.IsValidIndex(Skill.TripodTiers[0].SelectedEffectIndex))
         {
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
@@ -174,15 +175,15 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [강화된 충격] 효과로 데미지가 30%% 증가했습니다!"));
             }
-            else if (EffectName.Equals(TEXT("넓은 범위")))
+            else if (EffectName.Equals(TEXT("넓은 영역")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [넓은 범위] 효과로 공격 범위가 20%% 증가했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [넓은 영역] 효과로 공격 범위가 40%% 증가했습니다!"));
 
                 // 넓은 범위 효과 시각화
                 if (ShockWaveEffect)
                 {
                     FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.f;
-                    FVector Scale(1.2f, 1.2f, 1.2f); // 범위 20% 증가
+                    FVector Scale(1.4f, 1.4f, 1.4f); // 범위 40% 증가
                     UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation(), Scale);
                 }
             }
@@ -194,7 +195,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 2단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(1) && Skill.TripodTiers[1].bIsUnlocked &&
-            Skill.TripodTiers[1].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[1].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[1].TripodEffects.IsValidIndex(Skill.TripodTiers[1].SelectedEffectIndex))
         {
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
@@ -225,7 +227,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 3단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(2) && Skill.TripodTiers[2].bIsUnlocked &&
-            Skill.TripodTiers[2].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[2].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[2].TripodEffects.IsValidIndex(Skill.TripodTiers[2].SelectedEffectIndex))
         {
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
@@ -271,7 +274,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
         // 트라이포드에 따른 특수 효과
         // 1단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(0) && Skill.TripodTiers[0].bIsUnlocked &&
-            Skill.TripodTiers[0].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[0].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[0].TripodEffects.IsValidIndex(Skill.TripodTiers[0].SelectedEffectIndex))
         {
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
@@ -295,7 +299,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 2단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(1) && Skill.TripodTiers[1].bIsUnlocked &&
-            Skill.TripodTiers[1].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[1].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[1].TripodEffects.IsValidIndex(Skill.TripodTiers[1].SelectedEffectIndex))
         {
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
@@ -318,7 +323,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 3단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(2) && Skill.TripodTiers[2].bIsUnlocked &&
-            Skill.TripodTiers[2].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[2].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[2].TripodEffects.IsValidIndex(Skill.TripodTiers[2].SelectedEffectIndex))
         {
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
@@ -361,7 +367,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
         // 트라이포드에 따른 특수 효과
         // 1단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(0) && Skill.TripodTiers[0].bIsUnlocked &&
-            Skill.TripodTiers[0].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[0].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[0].TripodEffects.IsValidIndex(Skill.TripodTiers[0].SelectedEffectIndex))
         {
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
@@ -382,7 +389,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 2단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(1) && Skill.TripodTiers[1].bIsUnlocked &&
-            Skill.TripodTiers[1].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[1].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[1].TripodEffects.IsValidIndex(Skill.TripodTiers[1].SelectedEffectIndex))
         {
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
@@ -403,7 +411,8 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 
         // 3단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(2) && Skill.TripodTiers[2].bIsUnlocked &&
-            Skill.TripodTiers[2].SelectedEffectIndex >= 0)
+            Skill.TripodTiers[2].SelectedEffectIndex != -1 &&
+            Skill.TripodTiers[2].TripodEffects.IsValidIndex(Skill.TripodTiers[2].SelectedEffectIndex))
         {
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
@@ -424,41 +433,86 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 // 트라이포드 선택 함수
 void AMostArkPlayer::SelectTripod(int32 SkillIndex, int32 TierIndex, int32 EffectIndex)
 {
-    if (Skills.IsValidIndex(SkillIndex) &&
-        Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex) &&
-        Skills[SkillIndex].TripodTiers[TierIndex].TripodEffects.IsValidIndex(EffectIndex))
+    UE_LOG(LogTemp, Warning, TEXT("SelectTripod 호출: 스킬(%d), 티어(%d), 효과(%d)"),
+           SkillIndex, TierIndex, EffectIndex);
+
+    if (!Skills.IsValidIndex(SkillIndex))
     {
-        // 해당 티어가 잠금 해제되었는지 확인
-        if (Skills[SkillIndex].TripodTiers[TierIndex].bIsUnlocked)
+        UE_LOG(LogTemp, Error, TEXT("SelectTripod 실패: 잘못된 스킬 인덱스 %d"), SkillIndex);
+        return;
+    }
+
+    FSkillData &Skill = Skills[SkillIndex];
+
+    if (!Skill.TripodTiers.IsValidIndex(TierIndex))
+    {
+        UE_LOG(LogTemp, Error, TEXT("SelectTripod 실패: 잘못된 티어 인덱스 %d (스킬: %s)"),
+               TierIndex, *Skill.SkillName);
+        return;
+    }
+
+    FTripodTier &Tier = Skill.TripodTiers[TierIndex];
+
+    if (!Tier.TripodEffects.IsValidIndex(EffectIndex))
+    {
+        UE_LOG(LogTemp, Error, TEXT("SelectTripod 실패: 잘못된 효과 인덱스 %d (스킬: %s, 티어: %d)"),
+               EffectIndex, *Skill.SkillName, TierIndex + 1);
+        return;
+    }
+
+    // 해당 티어가 잠금 해제되었는지 확인
+    if (Tier.bIsUnlocked)
+    {
+        // 이미 선택된 효과와 같은 효과인지 확인
+        int32 CurrentSelectedEffect = Tier.SelectedEffectIndex;
+        if (CurrentSelectedEffect == EffectIndex)
         {
-            // 이미 선택된 효과와 같은 효과인지 확인
-            int32 CurrentSelectedEffect = Skills[SkillIndex].TripodTiers[TierIndex].SelectedEffectIndex;
-            if (CurrentSelectedEffect == EffectIndex)
-            {
-                // 같은 효과를 다시 선택한 경우, 선택 해제
-                Skills[SkillIndex].TripodTiers[TierIndex].SelectedEffectIndex = -1;
-                UE_LOG(LogTemp, Display, TEXT("트라이포드 선택 해제: 스킬(%s) 티어(%d)"),
-                       *Skills[SkillIndex].SkillName,
-                       TierIndex + 1);
-            }
-            else
-            {
-                // 새로운 효과 선택
-                Skills[SkillIndex].TripodTiers[TierIndex].SelectedEffectIndex = EffectIndex;
-
-                UE_LOG(LogTemp, Display, TEXT("트라이포드 선택: 스킬(%s) 티어(%d) 효과(%s)"),
-                       *Skills[SkillIndex].SkillName,
-                       TierIndex + 1,
-                       *Skills[SkillIndex].TripodTiers[TierIndex].TripodEffects[EffectIndex].EffectName);
-            }
-
-            // 트라이포드 효과 적용
-            ApplyTripodEffects(SkillIndex);
+            // 같은 효과를 다시 선택한 경우, 선택 해제
+            Tier.SelectedEffectIndex = -1;
+            UE_LOG(LogTemp, Warning, TEXT("트라이포드 선택 해제: 스킬(%s) 티어(%d) 효과(%s)"),
+                   *Skill.SkillName,
+                   TierIndex + 1,
+                   *Tier.TripodEffects[EffectIndex].EffectName);
         }
         else
         {
-            UE_LOG(LogTemp, Warning, TEXT("트라이포드 티어가 잠겨있습니다. 스킬 레벨을 높이세요."));
+            // 새로운 효과 선택
+            Tier.SelectedEffectIndex = EffectIndex;
+
+            UE_LOG(LogTemp, Warning, TEXT("트라이포드 선택: 스킬(%s) 티어(%d) 효과(%s)"),
+                   *Skill.SkillName,
+                   TierIndex + 1,
+                   *Tier.TripodEffects[EffectIndex].EffectName);
         }
+
+        // 트라이포드 효과 적용
+        ApplyTripodEffects(SkillIndex);
+
+        // 현재 선택된 모든 트라이포드 효과 로그 출력
+        UE_LOG(LogTemp, Warning, TEXT("=== [%s] 현재 적용 중인 트라이포드 효과 ==="), *Skill.SkillName);
+        for (int32 i = 0; i < Skill.TripodTiers.Num(); ++i)
+        {
+            const FTripodTier &CurrentTier = Skill.TripodTiers[i];
+            if (CurrentTier.bIsUnlocked && CurrentTier.SelectedEffectIndex != -1)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("   티어 %d: %s"),
+                       i + 1,
+                       *CurrentTier.TripodEffects[CurrentTier.SelectedEffectIndex].EffectName);
+            }
+            else if (CurrentTier.bIsUnlocked)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("   티어 %d: 선택된 효과 없음"), i + 1);
+            }
+            else
+            {
+                UE_LOG(LogTemp, Warning, TEXT("   티어 %d: 잠김"), i + 1);
+            }
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("트라이포드 티어가 잠겨있습니다. 스킬(%s) 레벨(%d)이 필요 레벨에 도달하지 못했습니다."),
+               *Skill.SkillName, Skill.SkillLevel);
     }
 }
 
@@ -529,6 +583,25 @@ void AMostArkPlayer::CheckTripodUnlock(int32 SkillIndex)
         // 디버그 출력
         UE_LOG(LogTemp, Display, TEXT("스킬 [%s] 티어 %d 해금 상태: %s (현재 레벨: %d)"),
                *Skill.SkillName, TierIndex + 1, bShouldUnlock ? TEXT("해금됨") : TEXT("잠김"), SkillLevel);
+
+        // 티어가 해금되었을 경우 선택 가능한 효과 목록 출력
+        if (bShouldUnlock)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("=== [%s] 티어 %d 선택 가능한 효과 ==="),
+                   *Skill.SkillName, TierIndex + 1);
+
+            // 각 효과 정보 출력
+            for (int32 EffectIndex = 0; EffectIndex < Tier.TripodEffects.Num(); ++EffectIndex)
+            {
+                if (Tier.TripodEffects.IsValidIndex(EffectIndex))
+                {
+                    UE_LOG(LogTemp, Warning, TEXT("   %d. %s - %s"),
+                           EffectIndex + 1,
+                           *Tier.TripodEffects[EffectIndex].EffectName,
+                           *Tier.TripodEffects[EffectIndex].Description);
+                }
+            }
+        }
     }
 }
 
@@ -573,12 +646,14 @@ void AMostArkPlayer::ApplyTripodEffects(int32 SkillIndex)
         Skill.Damage = 100.0f + (Skill.SkillLevel * 10.0f); // 레벨당 기본 데미지 10씩 증가
         Skill.Cooldown = 10.0f;
 
-        // 각 티어의 선택된 효과 적용
+        // 각 티어의 선택된 효과만 적용 (티어별로 하나씩)
         for (int32 i = 0; i < Skill.TripodTiers.Num(); ++i)
         {
             FTripodTier &Tier = Skill.TripodTiers[i];
 
-            if (Tier.bIsUnlocked && Tier.TripodEffects.IsValidIndex(Tier.SelectedEffectIndex))
+            // 해금된 티어이며, 효과가 선택되었는지 확인
+            if (Tier.bIsUnlocked && Tier.SelectedEffectIndex != -1 &&
+                Tier.TripodEffects.IsValidIndex(Tier.SelectedEffectIndex))
             {
                 FTripodEffect &Effect = Tier.TripodEffects[Tier.SelectedEffectIndex];
 
@@ -596,7 +671,13 @@ void AMostArkPlayer::ApplyTripodEffects(int32 SkillIndex)
                     ApplyWindBladeEffects(Skill, Tier.TierLevel, Effect.EffectName);
                 }
 
-                UE_LOG(LogTemp, Display, TEXT("트라이포드 효과 적용: %s"), *Effect.EffectName);
+                UE_LOG(LogTemp, Display, TEXT("트라이포드 효과 적용: 티어(%d) - %s"),
+                       Tier.TierLevel, *Effect.EffectName);
+            }
+            else if (Tier.bIsUnlocked && Tier.SelectedEffectIndex == -1)
+            {
+                UE_LOG(LogTemp, Display, TEXT("트라이포드 티어(%d)에 선택된 효과가 없습니다."),
+                       Tier.TierLevel);
             }
         }
     }
@@ -611,7 +692,7 @@ void AMostArkPlayer::ApplyShockEffects(FSkillData &Skill, int32 TierLevel, const
         {
             Skill.Damage *= 1.3f; // 데미지 30% 증가
         }
-        else if (EffectName.Equals(TEXT("넓은 범위")))
+        else if (EffectName.Equals(TEXT("넓은 영역")))
         {
             // 범위 증가 효과는 ExecuteSkillEffect에서 구현
         }
@@ -769,8 +850,8 @@ void AMostArkPlayer::SetupTripodEffects()
                     Tier.TripodEffects[0].EffectName = TEXT("강화된 충격");
                     Tier.TripodEffects[0].Description = TEXT("충격파의 데미지가 30% 증가합니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("넓은 범위");
-                    Tier.TripodEffects[1].Description = TEXT("충격파의 범위가 20% 증가합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("넓은 영역");
+                    Tier.TripodEffects[1].Description = TEXT("충격파의 영향 범위가 40% 증가합니다.");
 
                     Tier.TripodEffects[2].EffectName = TEXT("빠른 충전");
                     Tier.TripodEffects[2].Description = TEXT("충격파의 쿨다운이 15% 감소합니다.");
