@@ -16,6 +16,15 @@ AMostArkPlayer::AMostArkPlayer()
 {
     PrimaryActorTick.bCanEverTick = true;
 
+    WeaponComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponComp"));
+    WeaponComp->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
+
+    ConstructorHelpers::FObjectFinder<UStaticMesh> tempWeaponMesh(TEXT("/Script/Engine.StaticMesh'/Game/Assassin/Mesh/Separated_Mesh/Weapon/SM_sword_Sword.SM_sword_Sword'"));
+    if (tempWeaponMesh.Succeeded())
+    {
+        WeaponComp->SetStaticMesh(tempWeaponMesh.Object);
+    }
+
     FSkillData ShockSkill;
     ShockSkill.SkillName = TEXT("충격파");
     ShockSkill.SkillLevel = 1;

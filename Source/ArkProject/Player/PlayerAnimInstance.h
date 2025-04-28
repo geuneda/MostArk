@@ -17,4 +17,11 @@ class ARKPROJECT_API UPlayerAnimInstance : public UAnimInstance
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	float WalkSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	bool Attack1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	bool Attack2;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	bool Attack3;
 };

@@ -249,4 +249,10 @@ private:
     
     void ApplyAttackBuff(float Duration, float Multiplier);
     void RemoveAttackBuff();
+
+public:
+    // 무기 장착 관련
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+    class UStaticMeshComponent* WeaponComp;
+    
 };
