@@ -68,19 +68,16 @@ void STripodSystemWidget::Construct(const FArguments &InArgs)
         return FText::FromString(TEXT("스킬을 선택하세요")); })
                                                      .Font(FCoreStyle::GetDefaultFontStyle("Regular", 16))]
 
-                                      // 1단계 트라이포드 - 람다를 이용해 선택된 스킬의 트라이포드 정보를 실시간으로 생성
                                       + SVerticalBox::Slot()
                                             .AutoHeight()
                                             .Padding(FMargin(0, 5))
                                                 [SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[SNew(STextBlock).Text(FText::FromString(TEXT("1단계 트라이포드"))).Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))] + SVerticalBox::Slot().AutoHeight()[SAssignNew(Tripod1Slot, SBox)]]
 
-                                      // 2단계 트라이포드 - 람다를 이용해 선택된 스킬의 트라이포드 정보를 실시간으로 생성
                                       + SVerticalBox::Slot()
                                             .AutoHeight()
                                             .Padding(FMargin(0, 5))
                                                 [SNew(SVerticalBox) + SVerticalBox::Slot().AutoHeight()[SNew(STextBlock).Text(FText::FromString(TEXT("2단계 트라이포드"))).Font(FCoreStyle::GetDefaultFontStyle("Bold", 14))] + SVerticalBox::Slot().AutoHeight()[SAssignNew(Tripod2Slot, SBox)]]
 
-                                      // 3단계 트라이포드 - 람다를 이용해 선택된 스킬의 트라이포드 정보를 실시간으로 생성
                                       + SVerticalBox::Slot()
                                             .AutoHeight()
                                             .Padding(FMargin(0, 5))
@@ -236,10 +233,6 @@ void STripodSystemWidget::RefreshWidget()
 
 TSharedRef<SWidget> STripodSystemWidget::CreateTripodTierWidget(int32 SkillIndex, int32 TierIndex)
 {
-    // 로그 추가: 현재 생성 중인 스킬 및 티어 정보 확인
-    UE_LOG(LogTemp, Warning, TEXT("CreateTripodTierWidget 호출됨 - 스킬 인덱스: %d, 티어 인덱스: %d"), SkillIndex, TierIndex);
-
-    // 유효성 검사 추가
     if (!OwnerPlayer.IsValid() || !OwnerPlayer->Skills.IsValidIndex(SkillIndex) ||
         !OwnerPlayer->Skills[SkillIndex].TripodTiers.IsValidIndex(TierIndex))
     {
@@ -299,7 +292,7 @@ TSharedRef<SWidget> STripodSystemWidget::CreateTripodEffectWidget(int32 SkillInd
                      .HAlign(HAlign_Center)
                      .VAlign(VAlign_Center)
                          [SNew(STextBlock)
-                              .Text(FText::FromString(TEXT("---")))
+                              .Text(FText::FromString(TEXT("비어있음")))
                               .ColorAndOpacity(FSlateColor(FLinearColor::Gray))]];
     }
 
@@ -320,7 +313,7 @@ TSharedRef<SWidget> STripodSystemWidget::CreateTripodEffectWidget(int32 SkillInd
     }
     else if (bIsSelected)
     {
-        EffectColor = FSlateColor(FLinearColor(0.2f, 0.8f, 1.0f, 1.0f)); // 선택됨 (밝은 파란색)
+        EffectColor = FSlateColor(FLinearColor(0.2f, 0.8f, 1.0f, 1.0f)); // 선택됨
     }
     else
     {
