@@ -908,8 +908,8 @@ void AMostArkPlayer::SetupTripodEffects()
                     Tier.TripodEffects[1].EffectName = TEXT("전기 베기");
                     Tier.TripodEffects[1].Description = TEXT("베기에 전기 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("멀티 베기");
-                    Tier.TripodEffects[2].Description = TEXT("베기가 여러 개로 나뉘어 발사됩니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("마법 베기");
+                    Tier.TripodEffects[2].Description = TEXT("베기가 투사체를 발사합니다.");
                 }
             }
             else if (Skill.SkillName.Equals(TEXT("발차기")))
@@ -944,8 +944,8 @@ void AMostArkPlayer::SetupTripodEffects()
                     Tier.TripodEffects[1].EffectName = TEXT("화염 발차기");
                     Tier.TripodEffects[1].Description = TEXT("발차기에 화염 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("멀티 발차기");
-                    Tier.TripodEffects[2].Description = TEXT("발차기가 여러 개로 나뉘어 발사됩니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("마법 발차기");
+                    Tier.TripodEffects[2].Description = TEXT("발차기가 투사체를 발사합니다.");
                 }
             }
             else if (Skill.SkillName.Equals(TEXT("회전베기")))
@@ -980,8 +980,8 @@ void AMostArkPlayer::SetupTripodEffects()
                     Tier.TripodEffects[1].EffectName = TEXT("바람 회전베기");
                     Tier.TripodEffects[1].Description = TEXT("회전베기에 바람 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("멀티 회전베기");
-                    Tier.TripodEffects[2].Description = TEXT("회전베기가 여러 개로 나뉘어 발사됩니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("마법 회전베기");
+                    Tier.TripodEffects[2].Description = TEXT("회전베기가 투사체를 발사합니다.");
                 }
             }
         }
