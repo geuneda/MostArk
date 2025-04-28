@@ -25,6 +25,8 @@ AMostArkPlayer::AMostArkPlayer()
         WeaponComp->SetStaticMesh(tempWeaponMesh.Object);
     }
 
+    GetCharacterMovement()->MaxAcceleration = 10000.f;
+    GetCharacterMovement()->BrakingFrictionFactor = 0.f;
     FSkillData ShockSkill;
     ShockSkill.SkillName = TEXT("충격파");
     ShockSkill.SkillLevel = 1;
