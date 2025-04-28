@@ -28,17 +28,17 @@ AMostArkPlayer::AMostArkPlayer()
     GetCharacterMovement()->MaxAcceleration = 10000.f;
     GetCharacterMovement()->BrakingFrictionFactor = 0.f;
     FSkillData ShockSkill;
-    ShockSkill.SkillName = TEXT("충격파");
+    ShockSkill.SkillName = TEXT("베기");
     ShockSkill.SkillLevel = 1;
     Skills.Add(ShockSkill);
 
     FSkillData BladeStormSkill;
-    BladeStormSkill.SkillName = TEXT("블레이드 스톰");
+    BladeStormSkill.SkillName = TEXT("발차기");
     BladeStormSkill.SkillLevel = 1;
     Skills.Add(BladeStormSkill);
 
     FSkillData WindBladeSkill;
-    WindBladeSkill.SkillName = TEXT("윈드 블레이드");
+    WindBladeSkill.SkillName = TEXT("회전베기");
     WindBladeSkill.SkillLevel = 1;
     Skills.Add(WindBladeSkill);
 
@@ -161,10 +161,10 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
     FSkillData &Skill = Skills[SkillIndex];
 
     // 스킬별 효과 구현
-    if (Skill.SkillName.Equals(TEXT("충격파")))
+    if (Skill.SkillName.Equals(TEXT("베기")))
     {
         // 기본 효과
-        UE_LOG(LogTemp, Display, TEXT("충격파 발동! 전방에 %.1f 데미지의 충격을 발사합니다."), Skill.Damage);
+        UE_LOG(LogTemp, Display, TEXT("베기 발동! 전방에 %.1f 데미지의 베기를 발사합니다."), Skill.Damage);
 
         // 파티클 이펙트 생성
         if (ShockWaveEffect)
@@ -182,13 +182,13 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
 
-            if (EffectName.Equals(TEXT("강화된 충격")))
+            if (EffectName.Equals(TEXT("강화된 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [강화된 충격] 효과로 데미지가 30%% 증가했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [강화된 베기] 효과로 데미지가 30%% 증가했습니다!"));
             }
-            else if (EffectName.Equals(TEXT("넓은 영역")))
+            else if (EffectName.Equals(TEXT("넓은 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [넓은 영역] 효과로 공격 범위가 40%% 증가했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [넓은 베기] 효과로 공격 범위가 40%% 증가했습니다!"));
 
                 // 넓은 범위 효과 시각화
                 if (ShockWaveEffect)
@@ -198,9 +198,9 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
                     UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation(), Scale);
                 }
             }
-            else if (EffectName.Equals(TEXT("빠른 충전")))
+            else if (EffectName.Equals(TEXT("빠른 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [빠른 충전] 효과로 쿨다운이 15%% 감소했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [빠른 베기] 효과로 쿨다운이 15%% 감소했습니다!"));
             }
         }
 
@@ -212,12 +212,12 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
 
-            if (EffectName.Equals(TEXT("연속 충격")))
+            if (EffectName.Equals(TEXT("이중 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [연속 충격] 효과로 충격파가 한 번 더 발동됩니다!"));
-                UE_LOG(LogTemp, Display, TEXT("    두 번째 충격파 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
+                UE_LOG(LogTemp, Display, TEXT("    [이중 베기] 효과로 베기가 한 번 더 발동됩니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    두 번째 베기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
 
-                // 두 번째 충격파 이펙트 지연 생성
+                // 두 번째 베기 이펙트 지연 생성
                 if (ShockWaveEffect)
                 {
                     FTimerHandle SecondEffectTimer;
@@ -230,9 +230,9 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
                     GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
                 }
             }
-            else if (EffectName.Equals(TEXT("충격 침투")))
+            else if (EffectName.Equals(TEXT("관통 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [충격 침투] 효과로 적의 방어력을 20%% 무시합니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [관통 베기] 효과로 적의 방어력을 20%% 무시합니다!"));
             }
         }
 
@@ -244,9 +244,9 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
 
-            if (EffectName.Equals(TEXT("파괴적인 충격")))
+            if (EffectName.Equals(TEXT("파괴적 베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [파괴적인 충격] 효과로 적중 시 주변에 2차 폭발이 발생합니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [파괴적 베기] 효과로 적중 시 주변에 2차 폭발이 발생합니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
 
                 // 2차 폭발 이펙트 생성
@@ -265,10 +265,10 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             }
         }
     }
-    else if (Skill.SkillName.Equals(TEXT("블레이드 스톰")))
+    else if (Skill.SkillName.Equals(TEXT("발차기")))
     {
         // 기본 효과
-        UE_LOG(LogTemp, Display, TEXT("블레이드 스톰 발동! 주변에 %.1f 데미지의 칼날 폭풍을 일으킵니다."), Skill.Damage);
+        UE_LOG(LogTemp, Display, TEXT("발차기 발동! 주변에 %.1f 데미지의 발차기를 일으킵니다."), Skill.Damage);
 
         // 파티클 이펙트 생성
         if (BladeStormEffect)
@@ -291,20 +291,17 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
 
-            if (EffectName.Equals(TEXT("강화된 블레이드")))
+            if (EffectName.Equals(TEXT("강화된 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [강화된 블레이드] 효과로 데미지가 25%% 증가했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [강화된 발차기] 효과로 데미지가 25%% 증가했습니다!"));
             }
-            else if (EffectName.Equals(TEXT("지속 시간 증가")))
+            else if (EffectName.Equals(TEXT("넓은 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [지속 시간 증가] 효과로 블레이드 스톰의 지속 시간이 30%% 증가했습니다!"));
+                // 범위 증가는 ExecuteSkillEffect에서 구현
             }
-            else if (EffectName.Equals(TEXT("무기 강화")))
+            else if (EffectName.Equals(TEXT("빠른 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [무기 강화] 효과로 10초간 공격력이 15%% 증가합니다!"));
-
-                // 공격력 버프 적용
-                ApplyAttackBuff(10.0f, 1.15f);
+                Skill.Cooldown *= 0.85f; // 쿨다운 15% 감소
             }
         }
 
@@ -316,19 +313,27 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
 
-            if (EffectName.Equals(TEXT("화염 블레이드")))
+            if (EffectName.Equals(TEXT("이중 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [화염 블레이드] 효과로 블레이드가 화염 속성을 가지며 3초간 화상 효과를 줍니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [이중 발차기] 효과로 발차기가 한 번 더 발동됩니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    두 번째 발차기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
 
-                // 화상 효과 적용
-                ApplyBurnEffect(3.0f, 10.0f);
+                // 두 번째 발차기 이펙트 지연 생성
+                if (BladeStormEffect)
+                {
+                    FTimerHandle SecondEffectTimer;
+                    FTimerDelegate TimerDelegate;
+                    TimerDelegate.BindLambda([this]()
+                                             {
+                        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 150.f;
+                        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeStormEffect, SpawnLocation, GetActorRotation()); });
+
+                    GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
+                }
             }
-            else if (EffectName.Equals(TEXT("회복의 칼날")))
+            else if (EffectName.Equals(TEXT("관통 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [회복의 칼날] 효과로 적중한 적 1명당 최대 체력의 1%%를 회복합니다!"));
-
-                // 예시 회복 효과 (실제 적 적중 로직은 게임플레이 상태에 따라 달라질 수 있음)
-                UE_LOG(LogTemp, Display, TEXT("    체력을 회복했습니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [관통 발차기] 효과로 적의 방어력을 20%% 무시합니다!"));
             }
         }
 
@@ -340,21 +345,31 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
 
-            if (EffectName.Equals(TEXT("블레이드 춤")))
+            if (EffectName.Equals(TEXT("파괴적 발차기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [블레이드 춤] 효과로 블레이드 스톰 종료 후 전방으로 도약하며 강력한 일격을 가합니다!"));
-                UE_LOG(LogTemp, Display, TEXT("    도약 공격으로 %.1f 데미지를 입힙니다."), Skill.Damage * 1.5f);
-            }
-            else if (EffectName.Equals(TEXT("죽음의 소용돌이")))
-            {
-                UE_LOG(LogTemp, Display, TEXT("    [죽음의 소용돌이] 효과로 블레이드 스톰의 크기가 50%% 증가하고 중심부에서 더 강한 데미지를 입힙니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [파괴적 발차기] 효과로 적중 시 주변에 2차 폭발을 일으킵니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
+
+                // 2차 폭발 이펙트 생성
+                if (BladeStormEffect)
+                {
+                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 300.f;
+                    FVector Scale(1.5f, 1.5f, 1.5f); // 폭발 범위 더 크게
+
+                    FTimerHandle ExplosionTimer;
+                    FTimerDelegate TimerDelegate;
+                    TimerDelegate.BindLambda([this, SpawnLocation, Scale]()
+                                             { UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeStormEffect, SpawnLocation, FRotator::ZeroRotator, Scale); });
+
+                    GetWorld()->GetTimerManager().SetTimer(ExplosionTimer, TimerDelegate, 0.8f, false);
+                }
             }
         }
     }
-    else if (Skill.SkillName.Equals(TEXT("윈드 블레이드")))
+    else if (Skill.SkillName.Equals(TEXT("회전베기")))
     {
         // 기본 효과
-        UE_LOG(LogTemp, Display, TEXT("윈드 블레이드 발동! 전방으로 %.1f 데미지의 바람 칼날을 날립니다."), Skill.Damage);
+        UE_LOG(LogTemp, Display, TEXT("회전베기 발동! 주변에 %.1f 데미지의 회전베기를 일으킵니다."), Skill.Damage);
 
         // 파티클 이펙트 생성
         if (WindBladeEffect)
@@ -384,17 +399,17 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect1Index = Skill.TripodTiers[0].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[0].TripodEffects[Effect1Index].EffectName;
 
-            if (EffectName.Equals(TEXT("관통 바람")))
+            if (EffectName.Equals(TEXT("강화된 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [관통 바람] 효과로 바람 칼날이 적을 관통합니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [강화된 회전베기] 효과로 데미지가 25%% 증가했습니다!"));
             }
-            else if (EffectName.Equals(TEXT("빠른 발사")))
+            else if (EffectName.Equals(TEXT("넓은 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [빠른 발사] 효과로 시전 속도가 30%% 증가했습니다!"));
+                // 범위 증가는 ExecuteSkillEffect에서 구현
             }
-            else if (EffectName.Equals(TEXT("예리한 칼날")))
+            else if (EffectName.Equals(TEXT("빠른 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [예리한 칼날] 효과로 크리티컬 확률이 15%% 증가했습니다!"));
+                Skill.Cooldown *= 0.85f; // 쿨다운 15% 감소
             }
         }
 
@@ -406,17 +421,27 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect2Index = Skill.TripodTiers[1].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[1].TripodEffects[Effect2Index].EffectName;
 
-            if (EffectName.Equals(TEXT("바람의 축복")))
+            if (EffectName.Equals(TEXT("이중 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [바람의 축복] 효과로 5초간 이동 속도가 30%% 증가합니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [이중 회전베기] 효과로 회전베기가 한 번 더 발동됩니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    두 번째 회전베기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
 
-                // 이동 속도 버프 적용
-                ApplySpeedBuff(5.0f, 1.3f);
+                // 두 번째 회전베기 이펙트 지연 생성
+                if (WindBladeEffect)
+                {
+                    FTimerHandle SecondEffectTimer;
+                    FTimerDelegate TimerDelegate;
+                    TimerDelegate.BindLambda([this]()
+                                             {
+                        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 150.f;
+                        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WindBladeEffect, SpawnLocation, GetActorRotation()); });
+
+                    GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
+                }
             }
-            else if (EffectName.Equals(TEXT("삼중 칼날")))
+            else if (EffectName.Equals(TEXT("관통 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [삼중 칼날] 효과로 바람 칼날이 3개로 분열됩니다!"));
-                UE_LOG(LogTemp, Display, TEXT("    분열된 칼날 2개가 각각 %.1f 데미지를 추가로 입힙니다."), Skill.Damage * 0.5f);
+                UE_LOG(LogTemp, Display, TEXT("    [관통 회전베기] 효과로 적의 방어력을 20%% 무시합니다!"));
             }
         }
 
@@ -428,14 +453,24 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             int32 Effect3Index = Skill.TripodTiers[2].SelectedEffectIndex;
             FString EffectName = Skill.TripodTiers[2].TripodEffects[Effect3Index].EffectName;
 
-            if (EffectName.Equals(TEXT("태풍의 힘")))
+            if (EffectName.Equals(TEXT("파괴적 회전베기")))
             {
-                UE_LOG(LogTemp, Display, TEXT("    [태풍의 힘] 효과로 바람 칼날이 적중 지점에 소형 토네이도를 생성합니다!"));
-                UE_LOG(LogTemp, Display, TEXT("    토네이도가 3초간 유지되며 초당 %.1f 데미지를 입힙니다."), Skill.Damage * 0.3f);
-            }
-            else if (EffectName.Equals(TEXT("바람의 파괴자")))
-            {
-                UE_LOG(LogTemp, Display, TEXT("    [바람의 파괴자] 효과로 데미지가 80%% 증가하지만 쿨다운이 50%% 증가합니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    [파괴적 회전베기] 효과로 적중 시 주변에 2차 폭발을 일으킵니다!"));
+                UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
+
+                // 2차 폭발 이펙트 생성
+                if (WindBladeEffect)
+                {
+                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 300.f;
+                    FVector Scale(1.5f, 1.5f, 1.5f); // 폭발 범위 더 크게
+
+                    FTimerHandle ExplosionTimer;
+                    FTimerDelegate TimerDelegate;
+                    TimerDelegate.BindLambda([this, SpawnLocation, Scale]()
+                                             { UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WindBladeEffect, SpawnLocation, FRotator::ZeroRotator, Scale); });
+
+                    GetWorld()->GetTimerManager().SetTimer(ExplosionTimer, TimerDelegate, 0.8f, false);
+                }
             }
         }
     }
@@ -587,6 +622,8 @@ void AMostArkPlayer::CheckTripodUnlock(int32 SkillIndex)
         case 2: // 3단계 트라이포드 (레벨 10 이상)
             bShouldUnlock = (SkillLevel >= 10);
             break;
+        default:
+            break;
         }
 
         Tier.bIsUnlocked = bShouldUnlock;
@@ -669,15 +706,15 @@ void AMostArkPlayer::ApplyTripodEffects(int32 SkillIndex)
                 FTripodEffect &Effect = Tier.TripodEffects[Tier.SelectedEffectIndex];
 
                 // 스킬별로 다른 효과 적용
-                if (Skill.SkillName.Equals(TEXT("충격파")))
+                if (Skill.SkillName.Equals(TEXT("베기")))
                 {
                     ApplyShockEffects(Skill, Tier.TierLevel, Effect.EffectName);
                 }
-                else if (Skill.SkillName.Equals(TEXT("블레이드 스톰")))
+                else if (Skill.SkillName.Equals(TEXT("발차기")))
                 {
                     ApplyBladeStormEffects(Skill, Tier.TierLevel, Effect.EffectName);
                 }
-                else if (Skill.SkillName.Equals(TEXT("윈드 블레이드")))
+                else if (Skill.SkillName.Equals(TEXT("회전베기")))
                 {
                     ApplyWindBladeEffects(Skill, Tier.TierLevel, Effect.EffectName);
                 }
@@ -699,33 +736,33 @@ void AMostArkPlayer::ApplyShockEffects(FSkillData &Skill, int32 TierLevel, const
 {
     if (TierLevel == 1) // 1단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("강화된 충격")))
+        if (EffectName.Equals(TEXT("강화된 베기")))
         {
             Skill.Damage *= 1.3f; // 데미지 30% 증가
         }
-        else if (EffectName.Equals(TEXT("넓은 영역")))
+        else if (EffectName.Equals(TEXT("넓은 베기")))
         {
             // 범위 증가 효과는 ExecuteSkillEffect에서 구현
         }
-        else if (EffectName.Equals(TEXT("빠른 충전")))
+        else if (EffectName.Equals(TEXT("빠른 베기")))
         {
             Skill.Cooldown *= 0.85f; // 쿨다운 15% 감소
         }
     }
     else if (TierLevel == 2) // 2단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("연속 충격")))
+        if (EffectName.Equals(TEXT("이중 베기")))
         {
             Skill.Damage *= 1.7f; // 1회차 100% + 2회차 70%
         }
-        else if (EffectName.Equals(TEXT("충격 침투")))
+        else if (EffectName.Equals(TEXT("관통 베기")))
         {
             // 방어력 무시는 ExecuteSkillEffect에서 구현
         }
     }
     else if (TierLevel == 3) // 3단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("파괴적인 충격")))
+        if (EffectName.Equals(TEXT("파괴적 베기")))
         {
             Skill.Damage *= 1.5f; // 2차 폭발을 포함한 총 데미지
         }
@@ -737,42 +774,35 @@ void AMostArkPlayer::ApplyBladeStormEffects(FSkillData &Skill, int32 TierLevel, 
 {
     if (TierLevel == 1) // 1단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("강화된 블레이드")))
+        if (EffectName.Equals(TEXT("강화된 발차기")))
         {
             Skill.Damage *= 1.25f; // 데미지 25% 증가
         }
-        else if (EffectName.Equals(TEXT("지속 시간 증가")))
+        else if (EffectName.Equals(TEXT("넓은 발차기")))
         {
-            // 지속 시간 증가는 ExecuteSkillEffect에서 구현
+            // 범위 증가는 ExecuteSkillEffect에서 구현
         }
-        else if (EffectName.Equals(TEXT("무기 강화")))
+        else if (EffectName.Equals(TEXT("빠른 발차기")))
         {
-            UE_LOG(LogTemp, Display, TEXT("    [무기 강화] 효과로 10초간 공격력이 15%% 증가합니다!"));
-
-            // 공격력 버프 적용
-            ApplyAttackBuff(10.0f, 1.15f);
+            Skill.Cooldown *= 0.85f; // 쿨다운 15% 감소
         }
     }
     else if (TierLevel == 2) // 2단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("화염 블레이드")))
+        if (EffectName.Equals(TEXT("이중 발차기")))
         {
-            Skill.Damage *= 1.1f; // 화상 효과로 인한 10% 추가 데미지
+            Skill.Damage *= 1.7f; // 1회차 100% + 2회차 70%
         }
-        else if (EffectName.Equals(TEXT("회복의 칼날")))
+        else if (EffectName.Equals(TEXT("관통 발차기")))
         {
-            // 회복 효과는 ExecuteSkillEffect에서 구현
+            // 방어력 무시는 ExecuteSkillEffect에서 구현
         }
     }
     else if (TierLevel == 3) // 3단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("블레이드 춤")))
+        if (EffectName.Equals(TEXT("파괴적 발차기")))
         {
-            Skill.Damage *= 1.5f; // 도약 일격을 포함한 총 데미지
-        }
-        else if (EffectName.Equals(TEXT("죽음의 소용돌이")))
-        {
-            Skill.Damage *= 1.3f; // 범위 증가와 중심부 강화 효과
+            Skill.Damage *= 1.5f; // 2차 폭발을 포함한 총 데미지
         }
     }
 }
@@ -782,43 +812,35 @@ void AMostArkPlayer::ApplyWindBladeEffects(FSkillData &Skill, int32 TierLevel, c
 {
     if (TierLevel == 1) // 1단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("관통 바람")))
+        if (EffectName.Equals(TEXT("강화된 회전베기")))
         {
-            Skill.Damage *= 1.15f; // 관통으로 인한 15% 추가 데미지
+            Skill.Damage *= 1.25f; // 데미지 25% 증가
         }
-        else if (EffectName.Equals(TEXT("빠른 발사")))
+        else if (EffectName.Equals(TEXT("넓은 회전베기")))
         {
-            // 시전 속도 증가는 ExecuteSkillEffect에서 구현
+            // 범위 증가는 ExecuteSkillEffect에서 구현
         }
-        else if (EffectName.Equals(TEXT("예리한 칼날")))
+        else if (EffectName.Equals(TEXT("빠른 회전베기")))
         {
-            Skill.Damage *= 1.1f; // 크리티컬 확률 증가로 인한 평균 데미지 증가
+            Skill.Cooldown *= 0.85f; // 쿨다운 15% 감소
         }
     }
     else if (TierLevel == 2) // 2단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("바람의 축복")))
+        if (EffectName.Equals(TEXT("이중 회전베기")))
         {
-            UE_LOG(LogTemp, Display, TEXT("    [바람의 축복] 효과로 5초간 이동 속도가 30%% 증가합니다!"));
-
-            // 이동 속도 버프 적용
-            ApplySpeedBuff(5.0f, 1.3f);
+            Skill.Damage *= 1.7f; // 1회차 100% + 2회차 70%
         }
-        else if (EffectName.Equals(TEXT("삼중 칼날")))
+        else if (EffectName.Equals(TEXT("관통 회전베기")))
         {
-            Skill.Damage *= 2.0f; // 원래 데미지 100% + 분열 칼날 2개 각 50%
+            // 방어력 무시는 ExecuteSkillEffect에서 구현
         }
     }
     else if (TierLevel == 3) // 3단계 트라이포드
     {
-        if (EffectName.Equals(TEXT("태풍의 힘")))
+        if (EffectName.Equals(TEXT("파괴적 회전베기")))
         {
-            Skill.Damage *= 1.9f; // 토네이도 지속 데미지 90% 추가
-        }
-        else if (EffectName.Equals(TEXT("바람의 파괴자")))
-        {
-            Skill.Damage *= 1.8f;   // 데미지 80% 증가
-            Skill.Cooldown *= 1.5f; // 쿨다운 50% 증가
+            Skill.Damage *= 1.5f; // 2차 폭발을 포함한 총 데미지
         }
     }
 }
@@ -854,112 +876,112 @@ void AMostArkPlayer::SetupTripodEffects()
             Tier.TripodEffects.SetNum(3);
 
             // 스킬별로 다른 트라이포드 효과 설정
-            if (Skill.SkillName.Equals(TEXT("충격파")))
+            if (Skill.SkillName.Equals(TEXT("베기")))
             {
                 if (TierIndex == 0) // 1단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("강화된 충격");
-                    Tier.TripodEffects[0].Description = TEXT("충격파의 데미지가 30% 증가합니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("강화된 베기");
+                    Tier.TripodEffects[0].Description = TEXT("베기의 데미지가 30% 증가합니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("넓은 영역");
-                    Tier.TripodEffects[1].Description = TEXT("충격파의 영향 범위가 40% 증가합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("넓은 베기");
+                    Tier.TripodEffects[1].Description = TEXT("베기의 영향 범위가 40% 증가합니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("빠른 충전");
-                    Tier.TripodEffects[2].Description = TEXT("충격파의 쿨다운이 15% 감소합니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 베기");
+                    Tier.TripodEffects[2].Description = TEXT("베기의 쿨다운이 15% 감소합니다.");
                 }
                 else if (TierIndex == 1) // 2단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("연속 충격");
-                    Tier.TripodEffects[0].Description = TEXT("충격파가 한 번 더 발사됩니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("이중 베기");
+                    Tier.TripodEffects[0].Description = TEXT("베기가 한 번 더 발동됩니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("충격 침투");
-                    Tier.TripodEffects[1].Description = TEXT("충격파가 적의 방어력을 20% 무시합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("관통 베기");
+                    Tier.TripodEffects[1].Description = TEXT("베기가 적의 방어력을 20% 무시합니다.");
 
                     Tier.TripodEffects[2].EffectName = TEXT("빠른 시전");
                     Tier.TripodEffects[2].Description = TEXT("시전 속도가 30% 증가합니다.");
                 }
                 else if (TierIndex == 2) // 3단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("파괴적인 충격");
-                    Tier.TripodEffects[0].Description = TEXT("충격파가 적중하면 주변에 2차 폭발을 일으킵니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("파괴적 베기");
+                    Tier.TripodEffects[0].Description = TEXT("베기가 적중하면 주변에 2차 폭발을 일으킵니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("전기 충격");
-                    Tier.TripodEffects[1].Description = TEXT("충격파에 전기 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("전기 베기");
+                    Tier.TripodEffects[1].Description = TEXT("베기에 전기 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("멀티 충격");
-                    Tier.TripodEffects[2].Description = TEXT("충격파가 여러 개로 나뉘어 발사됩니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("멀티 베기");
+                    Tier.TripodEffects[2].Description = TEXT("베기가 여러 개로 나뉘어 발사됩니다.");
                 }
             }
-            else if (Skill.SkillName.Equals(TEXT("블레이드 스톰")))
+            else if (Skill.SkillName.Equals(TEXT("발차기")))
             {
                 if (TierIndex == 0) // 1단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("강화된 블레이드");
-                    Tier.TripodEffects[0].Description = TEXT("블레이드 스톰의 데미지가 25% 증가합니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("강화된 발차기");
+                    Tier.TripodEffects[0].Description = TEXT("발차기의 데미지가 25% 증가합니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("지속 시간 증가");
-                    Tier.TripodEffects[1].Description = TEXT("블레이드 스톰의 지속 시간이 30% 증가합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("넓은 발차기");
+                    Tier.TripodEffects[1].Description = TEXT("발차기의 영향 범위가 40% 증가합니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("무기 강화");
-                    Tier.TripodEffects[2].Description = TEXT("사용 후 10초간 공격력이 15% 증가합니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 발차기");
+                    Tier.TripodEffects[2].Description = TEXT("발차기의 쿨다운이 15% 감소합니다.");
                 }
                 else if (TierIndex == 1) // 2단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("화염 블레이드");
-                    Tier.TripodEffects[0].Description = TEXT("블레이드가 화염 속성을 가지며 화상 효과를 줍니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("이중 발차기");
+                    Tier.TripodEffects[0].Description = TEXT("발차기가 한 번 더 발동됩니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("회복의 칼날");
-                    Tier.TripodEffects[1].Description = TEXT("적중한 적 1명당 최대 체력의 1%를 회복합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("관통 발차기");
+                    Tier.TripodEffects[1].Description = TEXT("발차기가 적의 방어력을 20% 무시합니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("소용돌이 증가");
-                    Tier.TripodEffects[2].Description = TEXT("블레이드 스톰의 회전 속도가 증가하여 타격 횟수가 늘어납니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 시전");
+                    Tier.TripodEffects[2].Description = TEXT("시전 속도가 30% 증가합니다.");
                 }
                 else if (TierIndex == 2) // 3단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("블레이드 춤");
-                    Tier.TripodEffects[0].Description = TEXT("블레이드 스톰 종료 후 전방으로 도약하며 강력한 일격을 가합니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("파괴적 발차기");
+                    Tier.TripodEffects[0].Description = TEXT("발차기가 적중하면 주변에 2차 폭발을 일으킵니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("죽음의 소용돌이");
-                    Tier.TripodEffects[1].Description = TEXT("블레이드 스톰의 크기가 50% 증가하고 중심부에서 더 강한 데미지를 입힙니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("화염 발차기");
+                    Tier.TripodEffects[1].Description = TEXT("발차기에 화염 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("블레이드 폭풍");
-                    Tier.TripodEffects[2].Description = TEXT("블레이드 스톰에서 칼날이 튀어나가 주변 적을 추가로 공격합니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("멀티 발차기");
+                    Tier.TripodEffects[2].Description = TEXT("발차기가 여러 개로 나뉘어 발사됩니다.");
                 }
             }
-            else if (Skill.SkillName.Equals(TEXT("윈드 블레이드")))
+            else if (Skill.SkillName.Equals(TEXT("회전베기")))
             {
                 if (TierIndex == 0) // 1단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("관통 바람");
-                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 적을 관통합니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("강화된 회전베기");
+                    Tier.TripodEffects[0].Description = TEXT("회전베기의 데미지가 25% 증가합니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("빠른 발사");
-                    Tier.TripodEffects[1].Description = TEXT("시전 속도가 30% 증가합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("넓은 회전베기");
+                    Tier.TripodEffects[1].Description = TEXT("회전베기의 영향 범위가 40% 증가합니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("예리한 칼날");
-                    Tier.TripodEffects[2].Description = TEXT("크리티컬 확률이 15% 증가합니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 회전베기");
+                    Tier.TripodEffects[2].Description = TEXT("회전베기의 쿨다운이 15% 감소합니다.");
                 }
                 else if (TierIndex == 1) // 2단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("빙결 칼날");
-                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 얼음 속성을 가지며 적의 이동 속도를 감소시킵니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("이중 회전베기");
+                    Tier.TripodEffects[0].Description = TEXT("회전베기가 한 번 더 발동됩니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("연속 발사");
-                    Tier.TripodEffects[1].Description = TEXT("윈드 블레이드를 연속해서 2번 발사합니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("관통 회전베기");
+                    Tier.TripodEffects[1].Description = TEXT("회전베기가 적의 방어력을 20% 무시합니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("정신 집중");
-                    Tier.TripodEffects[2].Description = TEXT("치명타 데미지가 30% 증가합니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("빠른 시전");
+                    Tier.TripodEffects[2].Description = TEXT("시전 속도가 30% 증가합니다.");
                 }
                 else if (TierIndex == 2) // 3단계 트라이포드
                 {
-                    Tier.TripodEffects[0].EffectName = TEXT("회오리 칼날");
-                    Tier.TripodEffects[0].Description = TEXT("윈드 블레이드가 회오리 형태로 발사되어 주변 적들을 끌어당깁니다.");
+                    Tier.TripodEffects[0].EffectName = TEXT("파괴적 회전베기");
+                    Tier.TripodEffects[0].Description = TEXT("회전베기가 적중하면 주변에 2차 폭발을 일으킵니다.");
 
-                    Tier.TripodEffects[1].EffectName = TEXT("제압 바람");
-                    Tier.TripodEffects[1].Description = TEXT("적중된 적이 3초간 기절 상태가 됩니다.");
+                    Tier.TripodEffects[1].EffectName = TEXT("바람 회전베기");
+                    Tier.TripodEffects[1].Description = TEXT("회전베기에 바람 속성이 추가되어 5초간 도트 데미지를 입힙니다.");
 
-                    Tier.TripodEffects[2].EffectName = TEXT("선풍 칼날");
-                    Tier.TripodEffects[2].Description = TEXT("윈드 블레이드 발사 후 바람 기운이 폭발하여 주변에 추가 데미지를 입힙니다.");
+                    Tier.TripodEffects[2].EffectName = TEXT("멀티 회전베기");
+                    Tier.TripodEffects[2].Description = TEXT("회전베기가 여러 개로 나뉘어 발사됩니다.");
                 }
             }
         }
