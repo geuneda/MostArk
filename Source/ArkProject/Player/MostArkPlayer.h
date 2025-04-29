@@ -254,5 +254,20 @@ public:
     // 무기 장착 관련
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
     class UStaticMeshComponent* WeaponComp;
+    // 스킬 1 몽타주
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    class UAnimMontage* Skill1AnimMontage;
+    // 스킬 2 몽타주
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    class UAnimMontage* Skill2AnimMontage;
+    // 스킬 3 몽타주
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    class UAnimMontage* Skill3AnimMontage;
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    float Skill1AnimMontageSpeed = 1.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    float Skill2AnimMontageSpeed = 1.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    float Skill3AnimMontageSpeed = 1.f;
 };

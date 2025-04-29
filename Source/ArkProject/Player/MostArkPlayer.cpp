@@ -142,7 +142,6 @@ void AMostArkPlayer::UseSkill(int32 SkillIndex)
         // 스킬 사용 전 트라이포드 효과 적용
         ApplyTripodEffects(SkillIndex);
 
-        // 여기에 실제 스킬 사용 로직을 구현
         FSkillData &Skill = Skills[SkillIndex];
         UE_LOG(LogTemp, Display, TEXT("스킬 사용: %s (데미지: %.1f, 쿨다운: %.1f)"),
                *Skill.SkillName, Skill.Damage, Skill.Cooldown);
@@ -165,6 +164,12 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
     {
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("베기 발동! 전방에 %.1f 데미지의 베기를 발사합니다."), Skill.Damage);
+
+        if (Skill1AnimMontage)
+        {
+            auto* animIns = GetMesh()->GetAnimInstance();
+            animIns->Montage_Play(Skill1AnimMontage, Skill1AnimMontageSpeed);
+        }
 
         // 파티클 이펙트 생성
         if (ShockWaveEffect)
@@ -270,6 +275,12 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("발차기 발동! 주변에 %.1f 데미지의 발차기를 일으킵니다."), Skill.Damage);
 
+        if (Skill2AnimMontage)
+        {
+            auto* animIns = GetMesh()->GetAnimInstance();
+            animIns->Montage_Play(Skill2AnimMontage, Skill2AnimMontageSpeed);
+        }
+
         // 파티클 이펙트 생성
         if (BladeStormEffect)
         {
@@ -370,6 +381,12 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
     {
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("회전베기 발동! 주변에 %.1f 데미지의 회전베기를 일으킵니다."), Skill.Damage);
+
+        if (Skill3AnimMontage)
+        {
+            auto* animIns = GetMesh()->GetAnimInstance();
+            animIns->Montage_Play(Skill3AnimMontage, Skill3AnimMontageSpeed);
+        }
 
         // 파티클 이펙트 생성
         if (WindBladeEffect)
