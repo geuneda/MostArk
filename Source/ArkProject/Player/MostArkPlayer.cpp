@@ -17,7 +17,7 @@ AMostArkPlayer::AMostArkPlayer()
     PrimaryActorTick.bCanEverTick = true;
 
     WeaponComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponComp"));
-    WeaponComp->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
+    WeaponComp->SetupAttachment(GetMesh(), TEXT("Sword"));
 
     ConstructorHelpers::FObjectFinder<UStaticMesh> tempWeaponMesh(TEXT("/Script/Engine.StaticMesh'/Game/Assassin/Mesh/Separated_Mesh/Weapon/SM_sword_Sword.SM_sword_Sword'"));
     if (tempWeaponMesh.Succeeded())
