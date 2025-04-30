@@ -48,7 +48,7 @@ AMostArkPlayer::AMostArkPlayer()
     // 초기 스킬 포인트 설정
     SkillPoints = 30;
 
-    // 트라이포드 효과 초기화 (필수!)
+    // 트라이포드 효과 초기화
     for (int32 SkillIndex = 0; SkillIndex < Skills.Num(); ++SkillIndex)
     {
         FSkillData &Skill = Skills[SkillIndex];
@@ -61,20 +61,17 @@ AMostArkPlayer::AMostArkPlayer()
         }
     }
 
-    // Set size for player capsule
     GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
     bUseControllerRotationRoll = false;
 
-    // Configure character movement
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
     GetCharacterMovement()->bConstrainToPlane = true;
     GetCharacterMovement()->bSnapToPlaneAtStart = true;
 
-    // Create a camera boom...
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->SetUsingAbsoluteRotation(true);
@@ -82,10 +79,9 @@ AMostArkPlayer::AMostArkPlayer()
     CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
     CameraBoom->bDoCollisionTest = false;
 
-    // Create a camera...
     TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
     TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-    TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+    TopDownCameraComponent->bUsePawnControlRotation = false;
 
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
