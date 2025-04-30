@@ -20,18 +20,26 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class USphereComponent* CollisionComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class UParticleSystemComponent* ParticleComp;
 	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 	
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class USphereComponent* CollisionComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UParticleSystemComponent* ParticleComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UProjectileMovementComponent* ProjectileMovementComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	float ProjectileSpeed = 1000.f;
 	
 	FAttackInfo AttackInfo;
 	
