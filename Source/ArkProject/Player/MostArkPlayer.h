@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ArkProject/ArkProjectCharacter.h"
+#include "ArkProject/Projectile/BaseProjectile.h"
 #include "MostArkPlayer.generated.h"
 
 // 트라이포드 효과 정의
@@ -166,16 +167,6 @@ public:
     // 트라이포드 UI 토글 함수
     UFUNCTION(BlueprintCallable, Category = "UI")
     void ToggleTripodSystemUI();
-
-    // 파티클 시스템 컴포넌트
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-    class UParticleSystem* ShockWaveEffect;
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-    class UParticleSystem* BladeStormEffect;
-    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-    class UParticleSystem* WindBladeEffect;
     
     // 개별 스킬 사용 함수 (키 바인딩용)
     UFUNCTION(BlueprintCallable, Category = "Skill")
@@ -250,6 +241,8 @@ private:
     void ApplyAttackBuff(float Duration, float Multiplier);
     void RemoveAttackBuff();
 
+    float BaseMultiplier = 1.f;
+
 public:
     // 무기 장착 관련
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -270,4 +263,9 @@ public:
     float Skill2AnimMontageSpeed = 1.f;
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
     float Skill3AnimMontageSpeed = 1.f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Projectile")
+    TSubclassOf<ABaseProjectile> BasicProjectile;
+
+    void FireProjectile(float baseDamage, float attackMultiplier);
 };

@@ -171,13 +171,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             animIns->Montage_Play(Skill1AnimMontage, Skill1AnimMontageSpeed);
         }
 
-        // 파티클 이펙트 생성
-        if (ShockWaveEffect)
-        {
-            FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.f;
-            UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation());
-        }
-
         // 트라이포드에 따른 특수 효과 - 티어별로 선택된 효과만 적용
         // 1단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(0) && Skill.TripodTiers[0].bIsUnlocked &&
@@ -194,14 +187,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             else if (EffectName.Equals(TEXT("넓은 베기")))
             {
                 UE_LOG(LogTemp, Display, TEXT("    [넓은 베기] 효과로 공격 범위가 40%% 증가했습니다!"));
-
-                // 넓은 범위 효과 시각화
-                if (ShockWaveEffect)
-                {
-                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 100.f;
-                    FVector Scale(1.4f, 1.4f, 1.4f); // 범위 40% 증가
-                    UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation(), Scale);
-                }
             }
             else if (EffectName.Equals(TEXT("빠른 베기")))
             {
@@ -221,19 +206,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [이중 베기] 효과로 베기가 한 번 더 발동됩니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    두 번째 베기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
-
-                // 두 번째 베기 이펙트 지연 생성
-                if (ShockWaveEffect)
-                {
-                    FTimerHandle SecondEffectTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this]()
-                                             {
-                        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 150.f;
-                        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, GetActorRotation()); });
-
-                    GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
-                }
             }
             else if (EffectName.Equals(TEXT("관통 베기")))
             {
@@ -253,20 +225,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [파괴적 베기] 효과로 적중 시 주변에 2차 폭발이 발생합니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
-
-                // 2차 폭발 이펙트 생성
-                if (ShockWaveEffect)
-                {
-                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 300.f;
-                    FVector Scale(1.5f, 1.5f, 1.5f); // 폭발 범위 더 크게
-
-                    FTimerHandle ExplosionTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this, SpawnLocation, Scale]()
-                                             { UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ShockWaveEffect, SpawnLocation, FRotator::ZeroRotator, Scale); });
-
-                    GetWorld()->GetTimerManager().SetTimer(ExplosionTimer, TimerDelegate, 0.8f, false);
-                }
             }
         }
     }
@@ -280,19 +238,7 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             auto* animIns = GetMesh()->GetAnimInstance();
             animIns->Montage_Play(Skill2AnimMontage, Skill2AnimMontageSpeed);
         }
-
-        // 파티클 이펙트 생성
-        if (BladeStormEffect)
-        {
-            UGameplayStatics::SpawnEmitterAttached(
-                BladeStormEffect,
-                GetRootComponent(),
-                NAME_None,
-                FVector::ZeroVector,
-                FRotator::ZeroRotator,
-                EAttachLocation::SnapToTarget);
-        }
-
+        
         // 트라이포드에 따른 특수 효과
         // 1단계 트라이포드 효과 확인
         if (Skill.TripodTiers.IsValidIndex(0) && Skill.TripodTiers[0].bIsUnlocked &&
@@ -328,19 +274,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [이중 발차기] 효과로 발차기가 한 번 더 발동됩니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    두 번째 발차기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
-
-                // 두 번째 발차기 이펙트 지연 생성
-                if (BladeStormEffect)
-                {
-                    FTimerHandle SecondEffectTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this]()
-                                             {
-                        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 150.f;
-                        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeStormEffect, SpawnLocation, GetActorRotation()); });
-
-                    GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
-                }
             }
             else if (EffectName.Equals(TEXT("관통 발차기")))
             {
@@ -360,20 +293,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [파괴적 발차기] 효과로 적중 시 주변에 2차 폭발을 일으킵니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
-
-                // 2차 폭발 이펙트 생성
-                if (BladeStormEffect)
-                {
-                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 300.f;
-                    FVector Scale(1.5f, 1.5f, 1.5f); // 폭발 범위 더 크게
-
-                    FTimerHandle ExplosionTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this, SpawnLocation, Scale]()
-                                             { UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BladeStormEffect, SpawnLocation, FRotator::ZeroRotator, Scale); });
-
-                    GetWorld()->GetTimerManager().SetTimer(ExplosionTimer, TimerDelegate, 0.8f, false);
-                }
             }
         }
     }
@@ -386,25 +305,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
         {
             auto* animIns = GetMesh()->GetAnimInstance();
             animIns->Montage_Play(Skill3AnimMontage, Skill3AnimMontageSpeed);
-        }
-
-        // 파티클 이펙트 생성
-        if (WindBladeEffect)
-        {
-            FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 50.f + FVector(0, 0, 50.f);
-            FRotator SpawnRotation = GetActorRotation();
-
-            UParticleSystemComponent *ParticleComp = UGameplayStatics::SpawnEmitterAtLocation(
-                GetWorld(),
-                WindBladeEffect,
-                SpawnLocation,
-                SpawnRotation);
-
-            // 파티클이 전방으로 이동하도록 설정
-            if (ParticleComp)
-            {
-                ParticleComp->SetVectorParameter(TEXT("Direction"), GetActorForwardVector());
-            }
         }
 
         // 트라이포드에 따른 특수 효과
@@ -442,19 +342,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [이중 회전베기] 효과로 회전베기가 한 번 더 발동됩니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    두 번째 회전베기 발동! 추가로 %.1f 데미지를 입힙니다."), Skill.Damage * 0.7f);
-
-                // 두 번째 회전베기 이펙트 지연 생성
-                if (WindBladeEffect)
-                {
-                    FTimerHandle SecondEffectTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this]()
-                                             {
-                        FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 150.f;
-                        UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WindBladeEffect, SpawnLocation, GetActorRotation()); });
-
-                    GetWorld()->GetTimerManager().SetTimer(SecondEffectTimer, TimerDelegate, 0.5f, false);
-                }
             }
             else if (EffectName.Equals(TEXT("관통 회전베기")))
             {
@@ -474,20 +361,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             {
                 UE_LOG(LogTemp, Display, TEXT("    [파괴적 회전베기] 효과로 적중 시 주변에 2차 폭발을 일으킵니다!"));
                 UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
-
-                // 2차 폭발 이펙트 생성
-                if (WindBladeEffect)
-                {
-                    FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * 300.f;
-                    FVector Scale(1.5f, 1.5f, 1.5f); // 폭발 범위 더 크게
-
-                    FTimerHandle ExplosionTimer;
-                    FTimerDelegate TimerDelegate;
-                    TimerDelegate.BindLambda([this, SpawnLocation, Scale]()
-                                             { UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), WindBladeEffect, SpawnLocation, FRotator::ZeroRotator, Scale); });
-
-                    GetWorld()->GetTimerManager().SetTimer(ExplosionTimer, TimerDelegate, 0.8f, false);
-                }
             }
         }
     }
@@ -1216,5 +1089,27 @@ void AMostArkPlayer::RemoveAttackBuff()
         bHasAttackBuff = false;
 
         UE_LOG(LogTemp, Display, TEXT("공격력 버프 종료!"));
+    }
+}
+
+void AMostArkPlayer::FireProjectile(float baseDamage, float attackMultiplier)
+{
+    FActorSpawnParameters SpawnParams;
+    SpawnParams.Owner = this;
+    SpawnParams.Instigator = GetInstigator();
+
+    FVector ProjectileStart = GetActorLocation();
+    FRotator ProjectileRotation = GetActorRotation();
+
+    ABaseProjectile* Projectile = GetWorld()->SpawnActor<ABaseProjectile>(BasicProjectile, ProjectileStart, ProjectileRotation, SpawnParams);
+ 
+    if (Projectile)
+    {
+        FAttackInfo Info;
+        Info.Damage = baseDamage * attackMultiplier * BaseMultiplier;
+        Info.DamageType = UDamageType::StaticClass();
+        Info.InstigatorActor = this;
+
+        Projectile->SetAttackInfo(Info);
     }
 }
