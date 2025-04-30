@@ -11,6 +11,9 @@ class ARKPROJECT_API ABoss : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+	float CurrentHealth;
+	
 public:
 	// Sets default values for this character's properties
 	ABoss();
@@ -26,4 +29,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	float MaxHealth = 1000000.f;
 };

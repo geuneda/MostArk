@@ -15,7 +15,8 @@ ABoss::ABoss()
 void ABoss::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	CurrentHealth = MaxHealth;
 }
 
 // Called every frame
