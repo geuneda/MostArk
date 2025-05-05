@@ -200,6 +200,18 @@ private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
     class USpringArmComponent* CameraBoom;
 
+    // 공격용 콜리전 컴포넌트 선언
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+    class UBoxComponent* SwordCollision;
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+    class UBoxComponent* KickCollision;
+
+    // 콜리전 오버랩 함수 선언
+    UFUNCTION()
+    void OnSwordCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    void OnKickCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
     // 트라이포드 효과 적용 함수
     void ApplyTripodEffects(int32 SkillIndex);
     void ApplyShockEffects(FSkillData& Skill, int32 TierLevel, const FString& EffectName);

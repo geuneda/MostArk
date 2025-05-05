@@ -11,6 +11,7 @@
 #include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Components/BoxComponent.h"
 
 AMostArkPlayer::AMostArkPlayer()
 {
@@ -85,6 +86,21 @@ AMostArkPlayer::AMostArkPlayer()
 
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
+
+    // --- 공격용 콜리전 컴포넌트 생성 및 초기화 ---
+    SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
+    SwordCollision->SetupAttachment(GetMesh(), TEXT("Sword"));
+    SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    SwordCollision->SetCollisionObjectType(ECC_WorldDynamic);
+    SwordCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+    SwordCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+    KickCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("KickCollision"));
+    KickCollision->SetupAttachment(GetMesh(), TEXT("foot_r"));
+    KickCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    KickCollision->SetCollisionObjectType(ECC_WorldDynamic);
+    KickCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+    KickCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
 void AMostArkPlayer::BeginPlay()
@@ -110,6 +126,16 @@ void AMostArkPlayer::BeginPlay()
     bHasAttackBuff = false;
     OriginalDamageMultiplier = 1.0f;
     BurnEffectCount = 0;
+
+    // 콜리전 오버랩 이벤트 바인딩
+    if (SwordCollision)
+    {
+        SwordCollision->OnComponentBeginOverlap.AddDynamic(this, &AMostArkPlayer::OnSwordCollisionBeginOverlap);
+    }
+    if (KickCollision)
+    {
+        KickCollision->OnComponentBeginOverlap.AddDynamic(this, &AMostArkPlayer::OnKickCollisionBeginOverlap);
+    }
 
     UE_LOG(LogTemp, Warning, TEXT("MostArkPlayer BeginPlay 완료"));
 }
@@ -1107,5 +1133,22 @@ void AMostArkPlayer::FireProjectile(float baseDamage, float attackMultiplier)
         Info.InstigatorActor = this;
 
         Projectile->SetAttackInfo(Info);
+    }
+}
+
+// 콜리전 오버랩 구현
+void AMostArkPlayer::OnSwordCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor && OtherActor != this)
+    {
+        UGameplayStatics::ApplyDamage(OtherActor, 50.f, GetController(), this, nullptr);
+    }
+}
+
+void AMostArkPlayer::OnKickCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor && OtherActor != this)
+    {
+        UGameplayStatics::ApplyDamage(OtherActor, 30.f, GetController(), this, nullptr);
     }
 }
