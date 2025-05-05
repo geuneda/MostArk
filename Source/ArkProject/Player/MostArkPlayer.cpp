@@ -176,14 +176,29 @@ void AMostArkPlayer::UseSkill(int32 SkillIndex)
 // 스킬 효과 실행 함수
 void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
 {
-    if (!Skills.IsValidIndex(SkillIndex))
+    if (SkillIndex < 0 || SkillIndex >= Skills.Num())
         return;
 
-    FSkillData &Skill = Skills[SkillIndex];
+    // 현재 활성화된 스킬 인덱스 설정
+    ActiveSkillIndex = SkillIndex;
 
-    // 스킬별 효과 구현
-    if (Skill.SkillName.Equals(TEXT("베기")))
+    FSkillData& Skill = Skills[SkillIndex];
+    UE_LOG(LogTemp, Warning, TEXT("스킬 실행: %s"), *Skill.SkillName);
+
+    // 스킬별 효과 적용
+    if (Skill.SkillName == TEXT("베기"))
     {
+        ActivateSwordCollision(true);
+        
+        // 타이머로 콜리전 비활성화 (0.5초 후)
+        FTimerHandle TimerHandle;
+        GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+        {
+            ActivateSwordCollision(false);
+            ActiveSkillIndex = -1; // 스킬 종료
+        }), 0.5f, false);
+
+        // 기존 로직...
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("베기 발동! 전방에 %.1f 데미지의 베기를 발사합니다."), Skill.Damage);
 
@@ -250,8 +265,19 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             }
         }
     }
-    else if (Skill.SkillName.Equals(TEXT("발차기")))
+    else if (Skill.SkillName == TEXT("발차기"))
     {
+        ActivateKickCollision(true);
+        
+        // 타이머로 콜리전 비활성화 (0.3초 후)
+        FTimerHandle TimerHandle;
+        GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+        {
+            ActivateKickCollision(false);
+            ActiveSkillIndex = -1; // 스킬 종료
+        }), 0.3f, false);
+
+        // 기존 로직...
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("발차기 발동! 주변에 %.1f 데미지의 발차기를 일으킵니다."), Skill.Damage);
 
@@ -318,8 +344,19 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             }
         }
     }
-    else if (Skill.SkillName.Equals(TEXT("회전베기")))
+    else if (Skill.SkillName == TEXT("회전베기"))
     {
+        ActivateSwordCollision(true);
+        
+        // 타이머로 콜리전 비활성화 (0.7초 후)
+        FTimerHandle TimerHandle;
+        GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]()
+        {
+            ActivateSwordCollision(false);
+            ActiveSkillIndex = -1; // 스킬 종료
+        }), 0.7f, false);
+
+        // 기존 로직...
         // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("회전베기 발동! 주변에 %.1f 데미지의 회전베기를 일으킵니다."), Skill.Damage);
 
@@ -385,6 +422,79 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
                 UE_LOG(LogTemp, Display, TEXT("    2차 폭발 발생! 주변 적들에게 %.1f 데미지를 입힙니다."), Skill.Damage * 0.5f);
             }
         }
+    }
+}
+
+// 스킬 데미지 계산 함수 구현
+float AMostArkPlayer::CalculateSkillDamage(int32 SkillIndex)
+{
+    if (SkillIndex < 0 || SkillIndex >= Skills.Num())
+    {
+        return 10.0f; // 기본값
+    }
+
+    FSkillData& Skill = Skills[SkillIndex];
+    
+    // 기본 데미지 설정 (스킬별로 다른 기본값)
+    float BaseDamage = 0.0f;
+    if (Skill.SkillName == TEXT("베기"))
+    {
+        BaseDamage = 50.0f;
+    }
+    else if (Skill.SkillName == TEXT("발차기"))
+    {
+        BaseDamage = 30.0f;
+    }
+    else if (Skill.SkillName == TEXT("회전베기"))
+    {
+        BaseDamage = 70.0f;
+    }
+    else
+    {
+        BaseDamage = 20.0f;
+    }
+    
+    // 스킬 레벨에 따른 데미지 증가 (레벨당 10% 증가)
+    BaseDamage *= (1.0f + (Skill.SkillLevel - 1) * 0.1f);
+    
+    // 트라이포드 효과 적용
+    for (int32 TierIndex = 0; TierIndex < Skill.TripodTiers.Num(); ++TierIndex)
+    {
+        const FTripodTier& Tier = Skill.TripodTiers[TierIndex];
+        if (Tier.bIsUnlocked && Tier.SelectedEffectIndex >= 0 && Tier.SelectedEffectIndex < Tier.TripodEffects.Num())
+        {
+            const FTripodEffect& Effect = Tier.TripodEffects[Tier.SelectedEffectIndex];
+            
+            // 데미지 증가 효과 확인 (효과 이름에 "데미지" 또는 "공격력" 포함된 경우)
+            if (Effect.EffectName.Contains(TEXT("데미지")) || Effect.EffectName.Contains(TEXT("공격력")))
+            {
+                // 티어 레벨에 따라 데미지 증가 (티어1: 20%, 티어2: 40%, 티어3: 60%)
+                DamageMultiplier = 1.0f + (Tier.TierLevel * 0.2f);
+                BaseDamage *= DamageMultiplier;
+            }
+        }
+    }
+    
+    // 공격력 버프 적용
+    BaseDamage *= DamageMultiplier;
+    
+    return BaseDamage;
+}
+
+// 콜리전 활성화/비활성화 함수 구현
+void AMostArkPlayer::ActivateSwordCollision(bool bActivate)
+{
+    if (SwordCollision)
+    {
+        SwordCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+    }
+}
+
+void AMostArkPlayer::ActivateKickCollision(bool bActivate)
+{
+    if (KickCollision)
+    {
+        KickCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
     }
 }
 
@@ -1141,7 +1251,16 @@ void AMostArkPlayer::OnSwordCollisionBeginOverlap(UPrimitiveComponent* Overlappe
 {
     if (OtherActor && OtherActor != this)
     {
-        UGameplayStatics::ApplyDamage(OtherActor, 50.f, GetController(), this, nullptr);
+        // 현재 활성화된 스킬의 데미지 계산
+        float DamageAmount = 50.0f; // 기본값
+        
+        // 베기(0) 또는 회전베기(2) 스킬 사용 중일 때
+        if (ActiveSkillIndex == 0 || ActiveSkillIndex == 2)
+        {
+            DamageAmount = CalculateSkillDamage(ActiveSkillIndex);
+        }
+        
+        UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, GetController(), this, nullptr);
     }
 }
 
@@ -1149,6 +1268,14 @@ void AMostArkPlayer::OnKickCollisionBeginOverlap(UPrimitiveComponent* Overlapped
 {
     if (OtherActor && OtherActor != this)
     {
-        UGameplayStatics::ApplyDamage(OtherActor, 30.f, GetController(), this, nullptr);
+        // 발차기(1) 스킬 사용 중일 때
+        float DamageAmount = 30.0f; // 기본값
+        
+        if (ActiveSkillIndex == 1)
+        {
+            DamageAmount = CalculateSkillDamage(ActiveSkillIndex);
+        }
+        
+        UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, GetController(), this, nullptr);
     }
 }

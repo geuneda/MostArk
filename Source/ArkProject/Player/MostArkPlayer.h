@@ -186,6 +186,23 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Skill")
     void ResetSkillCooldown(int32 SkillIndex);
 
+    float DamageMultiplier = 1.f;
+
+    // 데미지 계산 함수 추가
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    float CalculateSkillDamage(int32 SkillIndex);
+
+    // 현재 활성화된 스킬 인덱스 (콜리전 데미지 계산용)
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+    int32 ActiveSkillIndex = -1;
+
+    // 콜리전 활성화/비활성화 함수
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void ActivateSwordCollision(bool bActivate);
+    
+    UFUNCTION(BlueprintCallable, Category = "Combat")
+    void ActivateKickCollision(bool bActivate);
+
     /** Returns TopDownCameraComponent subobject **/
     FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
     /** Returns CameraBoom subobject **/
