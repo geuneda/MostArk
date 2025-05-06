@@ -51,7 +51,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
 	void OnDeath();
 	
-	// 데미지 텍스트 위젯 클래스
+	// 데미지 텍스트 액터 클래스
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<class UDamageTextWidget> DamageTextWidgetClass;
+	TSubclassOf<class ADamageTextActor> DamageTextActorClass;
 };

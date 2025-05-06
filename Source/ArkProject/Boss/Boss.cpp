@@ -3,10 +3,9 @@
 
 #include "Boss.h"
 
-#include "ArkProject/UI/DamageTextWidget.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
-#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "../UI/DamageTextActor.h"
 
 // Sets default values
 ABoss::ABoss()
@@ -56,7 +55,7 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		CurrentHealth);
 	
 	// 데미지 텍스트 표시
-	if (ActualDamage > 0.0f && DamageTextWidgetClass)
+	if (ActualDamage > 0.0f && DamageTextActorClass)
 	{
 		// 플레이어 컨트롤러 가져오기
 		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
@@ -65,32 +64,25 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 			// 데미지 위치 (머리 위쪽으로 약간 올림)
 			FVector DamageLocation = this->GetActorLocation() + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.5f);
 			
-			// 월드 위치를 스크린 위치로 변환
-			FVector2D ScreenPosition;
-			bool bResult = UGameplayStatics::ProjectWorldToScreen(
-				PC,
+			// 크리티컬 여부 (임시: 100 이상의 데미지는 크리티컬로 표시)
+			bool bIsCritical = ActualDamage >= 100.0f;
+			
+			// 월드에 데미지 텍스트 액터 생성
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			
+			// 데미지 텍스트 액터 생성
+			ADamageTextActor* DamageActor = GetWorld()->SpawnActor<ADamageTextActor>(
+				DamageTextActorClass,
 				DamageLocation,
-				ScreenPosition,
-				false
+				FRotator::ZeroRotator,
+				SpawnParams
 			);
 			
-			if (bResult)
+			// 데미지 텍스트 초기화
+			if (DamageActor)
 			{
-				// 데미지 텍스트 위젯 생성
-				UDamageTextWidget* DamageWidget = CreateWidget<UDamageTextWidget>(PC, DamageTextWidgetClass);
-				if (DamageWidget)
-				{
-					// 뷰포트에 추가
-					DamageWidget->AddToViewport();
-					
-					// 크리티컬 여부 (예시: 100 이상의 데미지는 크리티컬로 표시)
-					bool bIsCritical = ActualDamage >= 100.0f;
-					
-					// 월드 위치 기반 데미지 텍스트 초기화 (보스 위치 추적)
-					// 오프셋을 사용하여 보스 머리 위에 표시
-					FVector Offset = FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.5f);
-					DamageWidget->InitializeDamageTextWorld(ActualDamage, GetActorLocation(), bIsCritical, this, Offset);
-				}
+				DamageActor->Initialize(ActualDamage, bIsCritical);
 			}
 		}
 	}
