@@ -198,8 +198,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             ActiveSkillIndex = -1; // 스킬 종료
         }), 0.5f, false);
 
-        // 기존 로직...
-        // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("베기 발동! 전방에 %.1f 데미지의 베기를 발사합니다."), Skill.Damage);
 
         if (Skill1AnimMontage)
@@ -277,8 +275,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             ActiveSkillIndex = -1; // 스킬 종료
         }), 0.3f, false);
 
-        // 기존 로직...
-        // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("발차기 발동! 주변에 %.1f 데미지의 발차기를 일으킵니다."), Skill.Damage);
 
         if (Skill2AnimMontage)
@@ -356,8 +352,6 @@ void AMostArkPlayer::ExecuteSkillEffect(int32 SkillIndex)
             ActiveSkillIndex = -1; // 스킬 종료
         }), 0.7f, false);
 
-        // 기존 로직...
-        // 기본 효과
         UE_LOG(LogTemp, Display, TEXT("회전베기 발동! 주변에 %.1f 데미지의 회전베기를 일으킵니다."), Skill.Damage);
 
         if (Skill3AnimMontage)
@@ -487,6 +481,12 @@ void AMostArkPlayer::ActivateSwordCollision(bool bActivate)
     if (SwordCollision)
     {
         SwordCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+        
+        // 콜리전이 활성화될 때 데미지 추적 플래그 초기화
+        if (bActivate)
+        {
+            bDamageAppliedForSwordAnimation = false;
+        }
     }
 }
 
@@ -495,6 +495,12 @@ void AMostArkPlayer::ActivateKickCollision(bool bActivate)
     if (KickCollision)
     {
         KickCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+        
+        // 콜리전이 활성화될 때 데미지 추적 플래그 초기화
+        if (bActivate)
+        {
+            bDamageAppliedForKickAnimation = false;
+        }
     }
 }
 
@@ -1249,6 +1255,12 @@ void AMostArkPlayer::FireProjectile(float baseDamage, float attackMultiplier)
 // 콜리전 오버랩 구현
 void AMostArkPlayer::OnSwordCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    // 이미 현재 애니메이션에서 데미지가 적용되었는지 확인
+    if (bDamageAppliedForSwordAnimation)
+    {
+        return; // 이미 데미지가 적용되었으면 추가 데미지 적용하지 않음
+    }
+    
     if (OtherActor && OtherActor != this)
     {
         // 현재 활성화된 스킬의 데미지 계산
@@ -1261,11 +1273,20 @@ void AMostArkPlayer::OnSwordCollisionBeginOverlap(UPrimitiveComponent* Overlappe
         }
         
         UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, GetController(), this, nullptr);
+        
+        // 데미지가 적용되었음을 표시
+        bDamageAppliedForSwordAnimation = true;
     }
 }
 
 void AMostArkPlayer::OnKickCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+    // 이미 현재 애니메이션에서 데미지가 적용되었는지 확인
+    if (bDamageAppliedForKickAnimation)
+    {
+        return; // 이미 데미지가 적용되었으면 추가 데미지 적용하지 않음
+    }
+    
     if (OtherActor && OtherActor != this)
     {
         // 발차기(1) 스킬 사용 중일 때
@@ -1277,5 +1298,8 @@ void AMostArkPlayer::OnKickCollisionBeginOverlap(UPrimitiveComponent* Overlapped
         }
         
         UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, GetController(), this, nullptr);
+        
+        // 데미지가 적용되었음을 표시
+        bDamageAppliedForKickAnimation = true;
     }
 }

@@ -6,6 +6,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../UI/DamageTextActor.h"
+#include "Components/BoxComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 ABoss::ABoss()
@@ -13,6 +15,14 @@ ABoss::ABoss()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetCharacterMovement()->bEnablePhysicsInteraction = false;
+	GetCharacterMovement()->PushForceFactor = 0.f;
+	GetCharacterMovement()->bPushForceUsingZOffset = false;
+	GetCharacterMovement()->bScalePushForceToVelocity = false;
+
+	HitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HitCollision"));
+	HitCollision->SetupAttachment(GetMesh(), TEXT("HitCollision"));
+	HitCollision->SetCollisionProfileName(TEXT("EnemyHit"));
 }
 
 // Called when the game starts or when spawned
@@ -21,9 +31,6 @@ void ABoss::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
-	
-	// 충돌 프로파일 설정 (플레이어 공격과 투사체를 받을 수 있도록)
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("Boss"));
 }
 
 // Called every frame
@@ -62,7 +69,7 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 		if (PC)
 		{
 			// 데미지 위치 (머리 위쪽으로 약간 올림)
-			FVector DamageLocation = this->GetActorLocation() + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.5f);
+			FVector DamageLocation = this->GetActorLocation() + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.2f);
 			
 			// 크리티컬 여부 (임시: 100 이상의 데미지는 크리티컬로 표시)
 			bool bIsCritical = ActualDamage >= 100.0f;

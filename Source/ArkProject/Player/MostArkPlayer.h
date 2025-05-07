@@ -196,6 +196,13 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
     int32 ActiveSkillIndex = -1;
 
+    // 애니메이션당 데미지가 이미 적용되었는지 추적
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+    bool bDamageAppliedForSwordAnimation = true;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
+    bool bDamageAppliedForKickAnimation = true;
+
     // 콜리전 활성화/비활성화 함수
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void ActivateSwordCollision(bool bActivate);

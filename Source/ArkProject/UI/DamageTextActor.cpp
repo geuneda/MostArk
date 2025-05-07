@@ -71,7 +71,7 @@ void ADamageTextActor::Initialize(float Damage, bool bInIsCritical)
 	// 크리티컬 여부 저장
 	bIsCritical = bInIsCritical;
 	
-	// 크리티컬이면 빨간색, 아니면 흰색
+	// 크리티컬이면 노란색, 아니면 흰색
 	FColor TextColor = bIsCritical ? FColor::Yellow : FColor::White;
 	TextRender->SetTextRenderColor(TextColor);
 	

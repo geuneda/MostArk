@@ -54,4 +54,8 @@ public:
 	// 데미지 텍스트 액터 클래스
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class ADamageTextActor> DamageTextActorClass;
+
+	// 충돌 처리용 캡슐 컴포넌트 추가
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	class UBoxComponent* HitCollision;
 };
