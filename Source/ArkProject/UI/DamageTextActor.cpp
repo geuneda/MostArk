@@ -88,7 +88,7 @@ void ADamageTextActor::Initialize(float Damage, bool bInIsCritical)
 	SetActorLocation(GetActorLocation() + RandomOffset);
 }
 
-// 빌보드 효과 (항상 카메라를 향하도록)
+// 빌보드 효과
 void ADamageTextActor::FaceCamera()
 {
 	if (UWorld* World = GetWorld())
