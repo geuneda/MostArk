@@ -16,6 +16,9 @@ class ARKPROJECT_API UBossAnimInstance : public UAnimInstance
 
 
 public:
+	
+	void InitializeBoss();
+	
 	virtual void NativeBeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
