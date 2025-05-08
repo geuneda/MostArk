@@ -198,10 +198,10 @@ public:
 
     // 애니메이션당 데미지가 이미 적용되었는지 추적
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-    bool bDamageAppliedForSwordAnimation = true;
+    bool bDamageAppliedForSwordAnimation = false;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
-    bool bDamageAppliedForKickAnimation = true;
+    bool bDamageAppliedForKickAnimation = false;
 
     // 콜리전 활성화/비활성화 함수
     UFUNCTION(BlueprintCallable, Category = "Combat")

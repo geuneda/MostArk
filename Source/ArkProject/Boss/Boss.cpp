@@ -20,9 +20,31 @@ ABoss::ABoss()
 	GetCharacterMovement()->bPushForceUsingZOffset = false;
 	GetCharacterMovement()->bScalePushForceToVelocity = false;
 
+	// 기본 충돌 컴포넌트 초기화
 	HitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HitCollision"));
 	HitCollision->SetupAttachment(GetMesh(), TEXT("HitCollision"));
 	HitCollision->SetCollisionProfileName(TEXT("EnemyHit"));
+
+	// 왼손 충돌 컴포넌트 초기화
+	LeftHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("LeftHitCollision"));
+	LeftHitCollision->SetupAttachment(GetMesh(), TEXT("hand_l"));
+	LeftHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
+	LeftHitCollision->SetBoxExtent(FVector(15.0f, 15.0f, 15.0f));
+	LeftHitCollision->SetHiddenInGame(false);
+
+	// 오른손 충돌 컴포넌트 초기화
+	RightHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("RightHitCollision"));
+	RightHitCollision->SetupAttachment(GetMesh(), TEXT("hand_r"));
+	RightHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
+	RightHitCollision->SetBoxExtent(FVector(15.0f, 15.0f, 15.0f));
+	RightHitCollision->SetHiddenInGame(false);
+
+	// 꼬리 충돌 컴포넌트 초기화
+	BackHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BackHitCollision"));
+	BackHitCollision->SetupAttachment(GetMesh(), TEXT("TailSocket"));
+	BackHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
+	BackHitCollision->SetBoxExtent(FVector(20.0f, 20.0f, 20.0f));
+	BackHitCollision->SetHiddenInGame(false);
 }
 
 // Called when the game starts or when spawned
@@ -31,6 +53,16 @@ void ABoss::BeginPlay()
 	Super::BeginPlay();
 
 	CurrentHealth = MaxHealth;
+
+	// 충돌 이벤트 바인딩
+	LeftHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnLeftHandOverlapBegin);
+	RightHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnRightHandOverlapBegin);
+	BackHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnTailOverlapBegin);
+
+	// 초기에는 모든 공격 충돌 비활성화
+	ActivateLeftHandAttack(false);
+	ActivateRightHandAttack(false);
+	ActivateTailAttack(false);
 }
 
 // Called every frame
@@ -105,4 +137,88 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	}
 	
 	return ActualDamage;
+}
+
+// 왼손 충돌 이벤트 처리
+void ABoss::OnLeftHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 자기 자신과의 충돌은 무시
+	if (OtherActor == this)
+	{
+		return;
+	}
+
+	// 충돌한 액터에 데미지 적용
+	ApplyDamageToTarget(OtherActor, LeftAttackDamage);
+
+	// 델리게이트 브로드캐스트
+	OnLeftHandHit.Broadcast(OtherActor, SweepResult.BoneName);
+}
+
+// 오른손 충돌 이벤트 처리
+void ABoss::OnRightHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 자기 자신과의 충돌은 무시
+	if (OtherActor == this)
+	{
+		return;
+	}
+
+	// 충돌한 액터에 데미지 적용
+	ApplyDamageToTarget(OtherActor, RightAttackDamage);
+
+	// 델리게이트 브로드캐스트
+	OnRightHandHit.Broadcast(OtherActor, SweepResult.BoneName);
+}
+
+// 꼬리 충돌 이벤트 처리
+void ABoss::OnTailOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 자기 자신과의 충돌은 무시
+	if (OtherActor == this)
+	{
+		return;
+	}
+
+	// 충돌한 액터에 데미지 적용
+	ApplyDamageToTarget(OtherActor, TailAttackDamage);
+
+	// 델리게이트 브로드캐스트
+	OnTailHit.Broadcast(OtherActor, SweepResult.BoneName);
+}
+
+// 왼손 공격 활성화/비활성화
+void ABoss::ActivateLeftHandAttack(bool bActivate)
+{
+	LeftHitCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	LeftHitCollision->SetCollisionResponseToAllChannels(bActivate ? ECR_Overlap : ECR_Ignore);
+}
+
+// 오른손 공격 활성화/비활성화
+void ABoss::ActivateRightHandAttack(bool bActivate)
+{
+	RightHitCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	RightHitCollision->SetCollisionResponseToAllChannels(bActivate ? ECR_Overlap : ECR_Ignore);
+}
+
+// 꼬리 공격 활성화/비활성화
+void ABoss::ActivateTailAttack(bool bActivate)
+{
+	BackHitCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	BackHitCollision->SetCollisionResponseToAllChannels(bActivate ? ECR_Overlap : ECR_Ignore);
+}
+
+// 데미지 적용 함수
+void ABoss::ApplyDamageToTarget(AActor* TargetActor, float DamageAmount)
+{
+	if (TargetActor && DamageAmount > 0.0f)
+	{
+		UGameplayStatics::ApplyDamage(
+			TargetActor,
+			DamageAmount,
+			GetController(),
+			this,
+			UDamageType::StaticClass()
+		);
+	}
 }

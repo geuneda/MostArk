@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Boss.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHitDelegate, AActor*, OtherActor, FName, BoneName);
+
 UCLASS()
 class ARKPROJECT_API ABoss : public ACharacter
 {
@@ -13,7 +15,7 @@ class ARKPROJECT_API ABoss : public ACharacter
 
 private:
 	float CurrentHealth;
-	
+
 public:
 	// Sets default values for this character's properties
 	ABoss();
@@ -31,6 +33,15 @@ public:
 
 	// 데미지 처리 함수 오버라이드
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	float LeftAttackDamage = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	float RightAttackDamage = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Damage)
+	float TailAttackDamage = 30.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth = 1000000.f;
@@ -55,7 +66,53 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<class ADamageTextActor> DamageTextActorClass;
 
-	// 충돌 처리용 캡슐 컴포넌트 추가
+	// 충돌 처리용 컴포넌트 추가
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	class UBoxComponent* HitCollision;
+
+	// 왼손 공격 처리용 컴포넌트 추가
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	class UBoxComponent* LeftHitCollision;
+
+	// 오른손 공격 처리용 컴포넌트 추가
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	class UBoxComponent* RightHitCollision;
+
+	// 꼬리 공격 처리용 컴포넌트 추가
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	class UBoxComponent* BackHitCollision;
+
+	// 충돌 감지 이벤트 델리게이트
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnBossHitDelegate OnLeftHandHit;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnBossHitDelegate OnRightHandHit;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnBossHitDelegate OnTailHit;
+
+	// 충돌 이벤트 처리 함수
+	UFUNCTION()
+	void OnLeftHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnRightHandOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnTailOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// 공격 활성화/비활성화 함수
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ActivateLeftHandAttack(bool bActivate);
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ActivateRightHandAttack(bool bActivate);
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ActivateTailAttack(bool bActivate);
+
+	// 데미지 적용 함수
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void ApplyDamageToTarget(AActor* TargetActor, float DamageAmount);
 };
