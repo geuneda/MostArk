@@ -56,7 +56,11 @@ public:
 	UFUNCTION()
 	void AnimNotify_Hide();
 	UFUNCTION()
-	void AnimNotify_Show();
+	void AnimNotify_Show();\
+	UFUNCTION()
+	void AnimNotify_GroundAttackStart();
+	UFUNCTION()
+	void AnimNotify_GroundAttackEnd();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
 	class UAnimMontage* GroundAttackMontage;

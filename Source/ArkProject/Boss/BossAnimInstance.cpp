@@ -146,3 +146,27 @@ void UBossAnimInstance::AnimNotify_Show()
 	}
 }
 
+void UBossAnimInstance::AnimNotify_GroundAttackStart()
+{
+	if (Boss)
+	{
+		Boss->ActivateGroundAttack(true);
+	}
+	else
+	{
+		InitializeBoss();
+	}
+}
+
+void UBossAnimInstance::AnimNotify_GroundAttackEnd()
+{
+	if (Boss)
+	{
+		Boss->ActivateGroundAttack(false);
+	}
+	else
+	{
+		InitializeBoss();
+	}
+}
+
