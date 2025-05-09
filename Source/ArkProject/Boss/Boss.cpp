@@ -3,6 +3,7 @@
 
 #include "Boss.h"
 
+#include "BossAttackController.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../UI/DamageTextActor.h"
@@ -19,6 +20,8 @@ ABoss::ABoss()
 	GetCharacterMovement()->PushForceFactor = 0.f;
 	GetCharacterMovement()->bPushForceUsingZOffset = false;
 	GetCharacterMovement()->bScalePushForceToVelocity = false;
+
+	BossAttackController = CreateDefaultSubobject<UBossAttackController>(TEXT("BossAttackController"));
 
 	// 기본 충돌 컴포넌트 초기화
 	HitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HitCollision"));
@@ -45,6 +48,13 @@ ABoss::ABoss()
 	BackHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	BackHitCollision->SetBoxExtent(FVector(20.0f, 20.0f, 20.0f));
 	BackHitCollision->SetHiddenInGame(false);
+
+	// 그라운드 패턴 컴포넌트 초기화
+	GroundHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("GroundHitCollision"));
+	GroundHitCollision->SetupAttachment(GetMesh(), TEXT("GroundSocket"));
+	GroundHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
+	GroundHitCollision->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
+	GroundHitCollision->SetHiddenInGame(false);
 }
 
 // Called when the game starts or when spawned
@@ -58,11 +68,13 @@ void ABoss::BeginPlay()
 	LeftHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnLeftHandOverlapBegin);
 	RightHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnRightHandOverlapBegin);
 	BackHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnTailOverlapBegin);
+	GroundHitCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss::OnGroundOverlapBegin);
 
 	// 초기에는 모든 공격 충돌 비활성화
 	ActivateLeftHandAttack(false);
 	ActivateRightHandAttack(false);
 	ActivateTailAttack(false);
+	ActivateGroundAttack(false);
 }
 
 // Called every frame
@@ -187,6 +199,22 @@ void ABoss::OnTailOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor*
 	OnTailHit.Broadcast(OtherActor, SweepResult.BoneName);
 }
 
+void ABoss::OnGroundOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 자기 자신과의 충돌은 무시
+	if (OtherActor == this)
+	{
+		return;
+	}
+
+	// 충돌한 액터에 데미지 적용
+	ApplyDamageToTarget(OtherActor, GroundAttackDamage);
+
+	// 델리게이트 브로드캐스트
+	OnGroundHit.Broadcast(OtherActor, SweepResult.BoneName);
+}
+
 // 왼손 공격 활성화/비활성화
 void ABoss::ActivateLeftHandAttack(bool bActivate)
 {
@@ -206,6 +234,12 @@ void ABoss::ActivateTailAttack(bool bActivate)
 {
 	BackHitCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	BackHitCollision->SetCollisionResponseToAllChannels(bActivate ? ECR_Overlap : ECR_Ignore);
+}
+
+void ABoss::ActivateGroundAttack(bool bActivate)
+{
+	GroundHitCollision->SetCollisionEnabled(bActivate ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	GroundHitCollision->SetCollisionResponseToAllChannels(bActivate ? ECR_Overlap : ECR_Ignore);
 }
 
 // 데미지 적용 함수

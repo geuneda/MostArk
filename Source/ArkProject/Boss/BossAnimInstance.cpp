@@ -17,6 +17,14 @@ void UBossAnimInstance::InitializeBoss()
 }
 
 
+void UBossAnimInstance::PlayLeftAttackMontage()
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(LeftAttackMontage, 1.0f);
+	}
+}
+
 void UBossAnimInstance::AnimNotify_LeftAttackStart()
 {
 	if (Boss)
@@ -38,6 +46,14 @@ void UBossAnimInstance::AnimNotify_LeftAttackEnd()
 	else
 	{
 		InitializeBoss();
+	}
+}
+
+void UBossAnimInstance::PlayRightAttackMontage()
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(RightAttackMontage, 1.0f);
 	}
 }
 
@@ -65,6 +81,14 @@ void UBossAnimInstance::AnimNotify_RightAttackEnd()
 	}
 }
 
+void UBossAnimInstance::PlayTailAttackMontage()
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(TailAttackMontage, 1.0f);
+	}
+}
+
 void UBossAnimInstance::AnimNotify_TailAttackStart()
 {
 	if (Boss)
@@ -82,6 +106,39 @@ void UBossAnimInstance::AnimNotify_TailAttackEnd()
 	if (Boss)
 	{
 		Boss->ActivateTailAttack(false);
+	}
+	else
+	{
+		InitializeBoss();
+	}
+}
+
+void UBossAnimInstance::PlayGroundAttackMontage()
+{
+	if (Boss)
+	{
+		FString AttackName = FString::Printf(TEXT("Under"));
+		Boss->PlayAnimMontage(GroundAttackMontage, 1.0f, FName(*AttackName));
+	}
+}
+
+void UBossAnimInstance::AnimNotify_Hide()
+{
+	if (Boss)
+	{
+		Boss->GetMesh()->SetVisibility(false);
+	}
+	else
+	{
+		InitializeBoss();
+	}
+}
+
+void UBossAnimInstance::AnimNotify_Show()
+{
+	if (Boss)
+	{
+		Boss->GetMesh()->SetVisibility(true);
 	}
 	else
 	{
