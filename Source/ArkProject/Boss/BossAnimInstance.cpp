@@ -122,6 +122,15 @@ void UBossAnimInstance::PlayGroundAttackMontage()
 	}
 }
 
+void UBossAnimInstance::StopGroundAttackMontage()
+{
+	if (Boss)
+	{
+		FString AttackName = FString::Printf(TEXT("Off"));
+		Boss->PlayAnimMontage(GroundAttackMontage, 1.0f, FName(*AttackName));
+	}
+}
+
 void UBossAnimInstance::AnimNotify_Hide()
 {
 	if (Boss)

@@ -52,7 +52,10 @@ public:
 	void AnimNotify_TailAttackEnd();
 
 	// 그라운드 패턴
+	UFUNCTION()
 	void PlayGroundAttackMontage();
+	UFUNCTION()
+	void StopGroundAttackMontage();
 	UFUNCTION()
 	void AnimNotify_Hide();
 	UFUNCTION()
