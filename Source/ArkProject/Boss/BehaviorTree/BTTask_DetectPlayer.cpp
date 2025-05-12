@@ -2,9 +2,7 @@
 
 #include "BTTask_DetectPlayer.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIController.h"
 #include "../Boss.h"
-#include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 
 UBTTask_DetectPlayer::UBTTask_DetectPlayer()

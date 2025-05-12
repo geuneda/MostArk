@@ -35,7 +35,7 @@ private:
 	float AcceptanceRadius = 50.0f;
 	
 	// 현재 대기 시간
-	float CurrentWaitTime = 0.0f;
+	float CurrentWaitTime = 5.0f;
 	
 	// 목적지에 도달했는지 여부
 	bool bHasReachedDestination = false;
