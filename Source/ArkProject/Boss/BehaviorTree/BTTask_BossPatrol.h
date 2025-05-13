@@ -24,7 +24,7 @@ public:
 private:
 	// 정찰 범위 (보스 주변 반경)
 	UPROPERTY(EditAnywhere, Category = "Patrol", meta = (AllowPrivateAccess = "true"))
-	float PatrolRadius = 1000.0f;
+	float PatrolRadius = 2000.0f;
 	
 	// 다음 정찰 지점을 찾을 때까지 대기 시간
 	UPROPERTY(EditAnywhere, Category = "Patrol", meta = (AllowPrivateAccess = "true"))
@@ -32,7 +32,7 @@ private:
 	
 	// 정찰 지점에 도달했다고 판단하는 거리
 	UPROPERTY(EditAnywhere, Category = "Patrol", meta = (AllowPrivateAccess = "true"))
-	float AcceptanceRadius = 50.0f;
+	float AcceptanceRadius = 500.f;
 	
 	// 현재 대기 시간
 	float CurrentWaitTime = 5.0f;

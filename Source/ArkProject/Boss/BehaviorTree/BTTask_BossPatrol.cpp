@@ -33,7 +33,6 @@ EBTNodeResult::Type UBTTask_BossPatrol::ExecuteTask(UBehaviorTreeComponent& Owne
     // 새로운 정찰 지점 찾기
     if (FindNewPatrolPoint(OwnerComp))
     {
-        // 태스크가 계속 실행 중임을 알림
         return EBTNodeResult::InProgress;
     }
     
@@ -69,12 +68,16 @@ void UBTTask_BossPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
         return;
     }
     
+    // **여기까지 문제 없음
+    
     // 현재 위치와 목적지 간의 거리 계산
     FVector CurrentLocation = Boss->GetActorLocation();
     float DistanceToTarget = FVector::Dist(CurrentLocation, TargetLocation);
+
+    UE_LOG(LogTemp, Warning, TEXT("DistanceToTarget: %f"), DistanceToTarget);
     
     // 목적지에 도달했는지 확인
-    if (!bHasReachedDestination && DistanceToTarget <= AcceptanceRadius)
+    if (!bHasReachedDestination )
     {
         bHasReachedDestination = true;
     }
@@ -93,11 +96,7 @@ void UBTTask_BossPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
                 CurrentWaitTime = 0.0f;
                 bHasReachedDestination = false;
             }
-            else
-            {
-                // 새로운 정찰 지점을 찾지 못했다면 태스크 완료
                 FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-            }
         }
     }
 }
@@ -150,6 +149,9 @@ bool UBTTask_BossPatrol::FindNewPatrolPoint(UBehaviorTreeComponent& OwnerComp)
     {
         BlackboardComp->SetValueAsVector("PatrolLocation", RandomLocation.Location);
         BossController->MoveToLocation(RandomLocation.Location, AcceptanceRadius);
+        
+        UE_LOG(LogTemp, Warning, TEXT("New Patrol Location: %s"), *RandomLocation.Location.ToString());
+        
         return true;
     }
     
