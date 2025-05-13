@@ -17,7 +17,15 @@ void UBossAnimInstance::InitializeBoss()
 }
 
 
-void UBossAnimInstance::PlayLeftAttackMontage()
+void UBossAnimInstance::PlayLeftMoveAttackMontage() const
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(LeftMoveAttackMontage, 1.0f);
+	}
+}
+
+void UBossAnimInstance::PlayLeftAttackMontage() const
 {
 	if (Boss)
 	{
@@ -49,7 +57,15 @@ void UBossAnimInstance::AnimNotify_LeftAttackEnd()
 	}
 }
 
-void UBossAnimInstance::PlayRightAttackMontage()
+void UBossAnimInstance::PlayRightMoveAttackMontage() const
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(RightMoveAttackMontage, 1.0f);
+	}
+}
+
+void UBossAnimInstance::PlayRightAttackMontage() const
 {
 	if (Boss)
 	{
@@ -81,7 +97,7 @@ void UBossAnimInstance::AnimNotify_RightAttackEnd()
 	}
 }
 
-void UBossAnimInstance::PlayTailAttackMontage()
+void UBossAnimInstance::PlayTailAttackMontage() const
 {
 	if (Boss)
 	{
@@ -113,7 +129,7 @@ void UBossAnimInstance::AnimNotify_TailAttackEnd()
 	}
 }
 
-void UBossAnimInstance::PlayGroundAttackMontage()
+void UBossAnimInstance::PlayGroundAttackMontage() const
 {
 	if (Boss)
 	{
@@ -122,7 +138,7 @@ void UBossAnimInstance::PlayGroundAttackMontage()
 	}
 }
 
-void UBossAnimInstance::StopGroundAttackMontage()
+void UBossAnimInstance::StopGroundAttackMontage() const
 {
 	if (Boss)
 	{

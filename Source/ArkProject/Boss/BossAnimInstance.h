@@ -30,22 +30,28 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
 	bool bIsAttack;
 
+	// 왼쪽 무빙 공격
+	void PlayLeftMoveAttackMontage() const;
+
 	// 왼손 공격
-	void PlayLeftAttackMontage();
+	void PlayLeftAttackMontage() const;
 	UFUNCTION()
 	void AnimNotify_LeftAttackStart();
 	UFUNCTION()
 	void AnimNotify_LeftAttackEnd();
 
+	// 오른쪽 무빙 공격
+	void PlayRightMoveAttackMontage() const;
+
 	// 오른손 공격
-	void PlayRightAttackMontage();
+	void PlayRightAttackMontage() const;
 	UFUNCTION()
 	void AnimNotify_RightAttackStart();
 	UFUNCTION()
 	void AnimNotify_RightAttackEnd();
 
 	// 꼬리 공격
-	void PlayTailAttackMontage();
+	void PlayTailAttackMontage() const;
 	UFUNCTION()
 	void AnimNotify_TailAttackStart();
 	UFUNCTION()
@@ -53,13 +59,13 @@ public:
 
 	// 그라운드 패턴
 	UFUNCTION()
-	void PlayGroundAttackMontage();
+	void PlayGroundAttackMontage() const;
 	UFUNCTION()
-	void StopGroundAttackMontage();
+	void StopGroundAttackMontage() const;
 	UFUNCTION()
 	void AnimNotify_Hide();
 	UFUNCTION()
-	void AnimNotify_Show();\
+	void AnimNotify_Show();
 	UFUNCTION()
 	void AnimNotify_GroundAttackStart();
 	UFUNCTION()
@@ -76,4 +82,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
 	class UAnimMontage* TailAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
+	class UAnimMontage* LeftMoveAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
+	class UAnimMontage* RightMoveAttackMontage;
 };
