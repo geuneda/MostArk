@@ -19,6 +19,7 @@ ABoss::ABoss()
 	GetCharacterMovement()->PushForceFactor = 0.f;
 	GetCharacterMovement()->bPushForceUsingZOffset = false;
 	GetCharacterMovement()->bScalePushForceToVelocity = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	// 기본 충돌 컴포넌트 초기화
 	HitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HitCollision"));

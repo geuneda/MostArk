@@ -48,6 +48,8 @@ EBTNodeResult::Type UBTTask_DetectPlayer::ExecuteTask(UBehaviorTreeComponent& Ow
     {
         BlackboardComp->SetValueAsObject("TargetPlayer", PlayerCharacter);
         BlackboardComp->SetValueAsVector("TargetLocation", PlayerCharacter->GetActorLocation());
+        
+        return EBTNodeResult::Failed;
     }
     
     return EBTNodeResult::Succeeded;

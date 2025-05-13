@@ -68,8 +68,6 @@ void UBTTask_BossPatrol::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* Node
         return;
     }
     
-    // **여기까지 문제 없음
-    
     // 현재 위치와 목적지 간의 거리 계산
     FVector CurrentLocation = Boss->GetActorLocation();
     float DistanceToTarget = FVector::Dist(CurrentLocation, TargetLocation);

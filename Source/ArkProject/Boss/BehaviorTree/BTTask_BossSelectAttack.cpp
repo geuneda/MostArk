@@ -80,7 +80,6 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
         // 좌측 이동 공격 (아직 구현되지 않음)
         BlackboardComp->SetValueAsEnum("AttackType", 3); // 3: 좌측 이동 공격
         
-        // 좌측 이동 공격 몽타주 재생 (아직 구현되지 않음)
         BossAnim->PlayLeftMoveAttackMontage();
         
         return EBTNodeResult::Succeeded;
@@ -90,11 +89,7 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
         // 우측 이동 공격 (아직 구현되지 않음)
         BlackboardComp->SetValueAsEnum("AttackType", 4); // 4: 우측 이동 공격
         
-        // 우측 이동 공격 몽타주 재생 (아직 구현되지 않음)
-        // BossAnim->PlayRightMoveAttackMontage();
-        
-        // 몽타주가 구현되지 않았으므로 일단 오른손 공격으로 대체
-        BossAnim->PlayRightAttackMontage();
+        BossAnim->PlayRightMoveAttackMontage();
         
         return EBTNodeResult::Succeeded;
     }

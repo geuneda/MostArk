@@ -36,10 +36,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	float TailAttackAngleThreshold = 15.0f;
 	
-	// 정면 공격 중 오른손 공격 각도 범위 (15도 ~ 45도)
-	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	float RightAttackAngleThreshold = 45.0f;
-	
 	// 플레이어와의 각도 계산
 	float CalculateAngleToPlayer(ABoss* Boss, ACharacter* Player);
 };

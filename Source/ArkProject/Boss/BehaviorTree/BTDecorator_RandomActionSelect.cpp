@@ -2,7 +2,6 @@
 
 #include "BTDecorator_RandomActionSelect.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 
 UBTDecorator_RandomActionSelect::UBTDecorator_RandomActionSelect()

@@ -128,6 +128,6 @@ void UBTTask_BossChasePlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8*
         BlackboardComp->SetValueAsBool("IsInAttackRange", true);
         
         // 태스크 완료
-        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
     }
+        FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 }
