@@ -3,6 +3,8 @@
 #include "MostArkPlayer.h"
 #include "Components/InputComponent.h"
 #include "../HUD/TripodSystemHUD.h"
+#include "ArkProject/Widget/PlayerSkillWidget.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -87,7 +89,7 @@ AMostArkPlayer::AMostArkPlayer()
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
 
-    // --- 공격용 콜리전 컴포넌트 생성 및 초기화 ---
+    // 공격용 콜리전 컴포넌트 생성 및 초기화 
     SwordCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("SwordCollision"));
     SwordCollision->SetupAttachment(GetMesh(), TEXT("Sword"));
     SwordCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -101,6 +103,10 @@ AMostArkPlayer::AMostArkPlayer()
     KickCollision->SetCollisionObjectType(ECC_WorldDynamic);
     KickCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
     KickCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+
+    // 밀림 현상 방지
+    GetCharacterMovement()->bEnablePhysicsInteraction = false;
+    GetCharacterMovement()->PushForceFactor = 0;
 }
 
 void AMostArkPlayer::BeginPlay()
@@ -119,6 +125,7 @@ void AMostArkPlayer::BeginPlay()
     // 쿨다운 관련 배열 초기화
     SkillCooldownTimers.SetNum(Skills.Num());
     bSkillAvailable.Init(true, Skills.Num());
+    SkillCooldownRemaining.Init(0.0f, Skills.Num());
 
     // 특수 효과 변수 초기화
     bHasSpeedBuff = false;
@@ -138,6 +145,30 @@ void AMostArkPlayer::BeginPlay()
     }
 
     UE_LOG(LogTemp, Warning, TEXT("MostArkPlayer BeginPlay 완료"));
+
+    // 스킬 위젯 생성 및 초기화
+    if (SkillWidgetFactory)
+    {
+        SkillWidget = CreateWidget<UPlayerSkillWidget>(GetWorld(), SkillWidgetFactory);
+        if (SkillWidget)
+        {
+            SkillWidget->AddToViewport(0);
+            
+            // 쿨다운 텍스트 초기화
+            for (int32 i = 0; i < Skills.Num(); ++i)
+            {
+                SkillWidget->ResetSkillCooldownText(i);
+            }
+        }
+    }
+    
+    // 쿨다운 텍스트 업데이트 타이머 설정 (0.1초마다 업데이트)
+    GetWorld()->GetTimerManager().SetTimer(
+        CooldownUpdateTimerHandle,
+        this,
+        &AMostArkPlayer::UpdateCooldownTexts,
+        0.1f,
+        true);
 }
 
 void AMostArkPlayer::Tick(float DeltaTime)
@@ -1074,6 +1105,14 @@ void AMostArkPlayer::OnSkillCooldownComplete(int32 SkillIndex)
     if (Skills.IsValidIndex(SkillIndex))
     {
         bSkillAvailable[SkillIndex] = true;
+        SkillCooldownRemaining[SkillIndex] = 0.0f;
+        
+        // 쿨다운 텍스트 초기화
+        if (SkillWidget)
+        {
+            SkillWidget->ResetSkillCooldownText(SkillIndex);
+        }
+        
         UE_LOG(LogTemp, Display, TEXT("스킬 %s의 쿨다운이 완료되었습니다!"), *Skills[SkillIndex].SkillName);
     }
 }
@@ -1087,6 +1126,7 @@ void AMostArkPlayer::ResetSkillCooldown(int32 SkillIndex)
 
         // 실제 쿨다운 시간 설정
         float CooldownTime = Skills[SkillIndex].Cooldown;
+        SkillCooldownRemaining[SkillIndex] = CooldownTime;
 
         // 타이머 설정
         GetWorld()->GetTimerManager().SetTimer(
@@ -1096,6 +1136,30 @@ void AMostArkPlayer::ResetSkillCooldown(int32 SkillIndex)
             false);
 
         UE_LOG(LogTemp, Display, TEXT("스킬 %s의 쿨다운 시작 (%.1f초)"), *Skills[SkillIndex].SkillName, CooldownTime);
+    }
+}
+
+// 쿨다운 텍스트 업데이트 함수
+void AMostArkPlayer::UpdateCooldownTexts()
+{
+    if (!SkillWidget)
+        return;
+        
+    for (int32 i = 0; i < Skills.Num(); ++i)
+    {
+        if (!bSkillAvailable[i])
+        {
+            // 남은 시간 계산
+            float RemainingTime = 0.0f;
+            if (GetWorld()->GetTimerManager().IsTimerActive(SkillCooldownTimers[i]))
+            {
+                RemainingTime = GetWorld()->GetTimerManager().GetTimerRemaining(SkillCooldownTimers[i]);
+                SkillCooldownRemaining[i] = RemainingTime;
+            }
+            
+            // 위젯 텍스트 업데이트
+            SkillWidget->UpdateSkillCooldownText(i, RemainingTime);
+        }
     }
 }
 

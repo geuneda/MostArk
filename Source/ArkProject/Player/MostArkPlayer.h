@@ -251,9 +251,18 @@ private:
     // 스킬 사용 가능 여부 배열
     TArray<bool> bSkillAvailable;
     
+    // 스킬 쿨다운 남은 시간 업데이트를 위한 타이머 핸들
+    FTimerHandle CooldownUpdateTimerHandle;
+    
+    // 스킬 쿨다운 남은 시간 배열
+    TArray<float> SkillCooldownRemaining;
+    
     // 쿨다운 완료 콜백 함수
     void OnSkillCooldownComplete(int32 SkillIndex);
     
+    // 쿨다운 텍스트 업데이트 함수
+    void UpdateCooldownTexts();
+
     // 특수 효과 변수
     bool bHasSpeedBuff;
     float OriginalMovementSpeed;
@@ -304,4 +313,9 @@ public:
     TSubclassOf<ABaseProjectile> BasicProjectile;
 
     void FireProjectile(float baseDamage, float attackMultiplier);
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    TSubclassOf<class UPlayerSkillWidget> SkillWidgetFactory;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    class UPlayerSkillWidget* SkillWidget;
 };
