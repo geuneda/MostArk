@@ -270,6 +270,7 @@ void ABoss::ApplyDamageToTarget(AActor* TargetActor, float DamageAmount)
 {
 	if (TargetActor && DamageAmount > 0.0f)
 	{
+		// 데미지 적용
 		UGameplayStatics::ApplyDamage(
 			TargetActor,
 			DamageAmount,
@@ -277,6 +278,18 @@ void ABoss::ApplyDamageToTarget(AActor* TargetActor, float DamageAmount)
 			this,
 			UDamageType::StaticClass()
 		);
+
+		FVector ImpactLocation;
+		// 캐릭터만 타격 이펙트 생성성
+		ACharacter* TargetCharacter = Cast<ACharacter>(TargetActor);
+		if (TargetCharacter)
+		{
+			// 캐릭터의 경우 캐릭터 중앙 위치에 생성
+			ImpactLocation = TargetCharacter->GetMesh()->GetComponentLocation();
+		}
+		
+		// 데미지 효과 VFX 생성
+		SpawnDamageImpactVFX(ImpactLocation);
 	}
 }
 
@@ -372,4 +385,34 @@ UNiagaraComponent* ABoss::SpawnGroundAttackFinishVFX(const FVector& Location)
 		UE_LOG(LogTemp, Warning, TEXT("Boss - 바닥 위치를 찾을 수 없습니다. 종료 VFX 생성 실패."));
 		return nullptr;
 	}
+}
+
+// 데미지 효과 VFX 스폰 함수
+UNiagaraComponent* ABoss::SpawnDamageImpactVFX(const FVector& Location)
+{
+	// VFX 시스템이 설정되어 있는지 확인
+	if (!DamageImpactVFX)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Boss - DamageImpactVFX가 설정되지 않았습니다."));
+		return nullptr;
+	}
+
+	// 데미지 위치에 VFX 생성 (레이캐스트 없이 직접 위치에 생성)
+	FVector SpawnLocation = Location + DamageImpactVFXOffset;
+	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		DamageImpactVFX,
+		SpawnLocation,
+		FRotator::ZeroRotator,
+		DamageImpactVFXScale,
+		true,
+		true,
+		ENCPoolMethod::AutoRelease
+	);
+
+	if (NiagaraComp)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Boss - 데미지 효과 VFX 생성 성공: %s"), *SpawnLocation.ToString());
+	}
+	return NiagaraComp;
 }

@@ -165,4 +165,20 @@ public:
 	// 그라운드 공격 종료 VFX 스폰 함수
 	UFUNCTION(BlueprintCallable, Category = "VFX")
 	UNiagaraComponent* SpawnGroundAttackFinishVFX(const FVector& Location);
+	
+	// 데미지 효과 VFX 시스템
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	UNiagaraSystem* DamageImpactVFX;
+	
+	// 데미지 VFX 스케일 조정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector DamageImpactVFXScale = FVector(1.0f, 1.0f, 1.0f);
+	
+	// 데미지 VFX 위치 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector DamageImpactVFXOffset = FVector(0.0f, 0.0f, 50.0f);
+	
+	// 데미지 효과 VFX 스폰 함수
+	UFUNCTION(BlueprintCallable, Category = "VFX")
+	UNiagaraComponent* SpawnDamageImpactVFX(const FVector& Location);
 };
