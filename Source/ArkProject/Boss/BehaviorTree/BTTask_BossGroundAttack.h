@@ -28,11 +28,29 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	float GroundAttackDuration = 7.0f;
 	
+	// 플레이어 추적 시간 (공격 종료 전에 멈추기 위한 시간)
+	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	float StopFollowingTime = 5.0f;
+	
+	// 플레이어 추적 업데이트 간격
+	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	float UpdateInterval = 0.5f;
+	
+	// 목적지에 도달했다고 판단하는 거리
+	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	float AcceptanceRadius = 200.0f;
+	
 	// 현재 경과 시간
 	float CurrentTime = 0.0f;
 	
+	// 마지막 위치 업데이트 시간
+	float LastUpdateTime = 0.0f;
+	
 	// 공격이 시작되었는지 여부
 	bool bAttackStarted = false;
+	
+	// 플레이어 추적 중인지 여부
+	bool bIsFollowingPlayer = false;
 	
 	// 시작 VFX 컴포넌트 참조
 	class UNiagaraComponent* GroundAttackVFXComponent = nullptr;

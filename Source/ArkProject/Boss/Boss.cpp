@@ -280,7 +280,7 @@ void ABoss::ApplyDamageToTarget(AActor* TargetActor, float DamageAmount)
 		);
 
 		FVector ImpactLocation;
-		// 캐릭터만 타격 이펙트 생성성
+		// 캐릭터만 타격 이펙트 생성
 		ACharacter* TargetCharacter = Cast<ACharacter>(TargetActor);
 		if (TargetCharacter)
 		{
