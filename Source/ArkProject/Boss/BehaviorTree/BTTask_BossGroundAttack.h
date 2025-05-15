@@ -20,6 +20,9 @@ public:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	
+	// VFX 정리 함수
+	void CleanupVFX();
+	
 private:
 	// 그라운드 공격 지속 시간
 	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
@@ -30,4 +33,13 @@ private:
 	
 	// 공격이 시작되었는지 여부
 	bool bAttackStarted = false;
+	
+	// 시작 VFX 컴포넌트 참조
+	class UNiagaraComponent* GroundAttackVFXComponent = nullptr;
+	
+	// 종료 VFX 컴포넌트 참조
+	class UNiagaraComponent* GroundAttackFinishVFXComponent = nullptr;
+	
+	// VFX 생성 위치
+	FVector VFXSpawnLocation = FVector::ZeroVector;
 };

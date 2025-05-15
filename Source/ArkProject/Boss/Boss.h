@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 #include "Boss.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnBossHitDelegate, AActor*, OtherActor, FName, BoneName);
@@ -131,4 +133,36 @@ public:
 	// 데미지 적용 함수
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void ApplyDamageToTarget(AActor* TargetActor, float DamageAmount);
+
+	// 그라운드 공격 시작 VFX 시스템
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	UNiagaraSystem* GroundAttackVFX;
+
+	// 그라운드 공격 종료 VFX 시스템
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	UNiagaraSystem* GroundAttackFinishVFX;
+
+	// VFX 스케일 조정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector GroundAttackVFXScale = FVector(1.0f, 1.0f, 1.0f);
+
+	// 종료 VFX 스케일 조정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector GroundAttackFinishVFXScale = FVector(1.5f, 1.5f, 1.5f);
+
+	// VFX 위치 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector GroundAttackVFXOffset = FVector(0.0f, 0.0f, 0.0f);
+
+	// 종료 VFX 위치 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+	FVector GroundAttackFinishVFXOffset = FVector(0.0f, 0.0f, 50.0f);
+
+	// 그라운드 공격 VFX 스폰 함수
+	UFUNCTION(BlueprintCallable, Category = "VFX")
+	UNiagaraComponent* SpawnGroundAttackVFX(const FVector& Location);
+
+	// 그라운드 공격 종료 VFX 스폰 함수
+	UFUNCTION(BlueprintCallable, Category = "VFX")
+	UNiagaraComponent* SpawnGroundAttackFinishVFX(const FVector& Location);
 };

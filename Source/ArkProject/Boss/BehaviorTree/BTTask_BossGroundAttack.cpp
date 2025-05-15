@@ -5,6 +5,8 @@
 #include "../Boss.h"
 #include "../BossAnimInstance.h"
 #include "GameFramework/Character.h"
+#include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 UBTTask_BossGroundAttack::UBTTask_BossGroundAttack()
 {
@@ -39,6 +41,12 @@ EBTNodeResult::Type UBTTask_BossGroundAttack::ExecuteTask(UBehaviorTreeComponent
     CurrentTime = 0.0f;
     bAttackStarted = true;
     
+    // VFX 생성 위치 처리 - 보스 앞쪽 바닥
+    FVector BossLocation = Boss->GetActorLocation();
+    
+    // 그라운드 공격 VFX 스폰
+    GroundAttackVFXComponent = Boss->SpawnGroundAttackVFX(BossLocation);
+    
     // 태스크가 계속 실행 중임을 알림
     return EBTNodeResult::InProgress;
 }
@@ -55,6 +63,8 @@ void UBTTask_BossGroundAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
         ABoss* Boss = GetBossCharacter(&OwnerComp);
         if (!Boss)
         {
+            // VFX 정리
+            CleanupVFX();
             FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
             return;
         }
@@ -63,6 +73,8 @@ void UBTTask_BossGroundAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
         UBossAnimInstance* BossAnim = Cast<UBossAnimInstance>(Boss->GetMesh()->GetAnimInstance());
         if (!BossAnim)
         {
+            // VFX 정리
+            CleanupVFX();
             FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
             return;
         }
@@ -70,7 +82,41 @@ void UBTTask_BossGroundAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
         // 그라운드 공격 몽타주 정지
         BossAnim->StopGroundAttackMontage();
         
+        // 종료 VFX 생성
+        GroundAttackFinishVFXComponent = Boss->SpawnGroundAttackFinishVFX(VFXSpawnLocation);
+        
+        // 시작 VFX 정리
+        CleanupVFX();
+        
+        // 1초 뒤에 종료 VFX 정리
+        FTimerHandle FinishVFXTimerHandle;
+        GetWorld()->GetTimerManager().SetTimer(FinishVFXTimerHandle, [this]()
+        {
+            if (GroundAttackFinishVFXComponent)
+            {
+                GroundAttackFinishVFXComponent->SetFloatParameter(TEXT("FadeOutMultiplier"), 1.0f);
+                GroundAttackFinishVFXComponent->SetAutoDestroy(true);
+                GroundAttackFinishVFXComponent = nullptr;
+            }
+        }, 1.0f, false);
+        
         // 태스크 완료
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
+    }
+}
+
+// VFX 정리 함수
+void UBTTask_BossGroundAttack::CleanupVFX()
+{
+    if (GroundAttackVFXComponent)
+    {
+        // 페이드아웃 효과를 적용하여 서서히 사라지게 함
+        GroundAttackVFXComponent->SetFloatParameter(TEXT("FadeOutMultiplier"), 1.0f);
+        
+        // 2초 후 자동 제거되도록 설정
+        GroundAttackVFXComponent->SetAutoDestroy(true);
+        
+        // 참조 초기화
+        GroundAttackVFXComponent = nullptr;
     }
 }
