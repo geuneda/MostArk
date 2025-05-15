@@ -72,6 +72,11 @@ public:
 	void AnimNotify_GroundAttackStart();
 	UFUNCTION()
 	void AnimNotify_GroundAttackEnd();
+
+	// 사망처리
+	UFUNCTION()
+	void PlayDeathMontage();
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
 	class UAnimMontage* GroundAttackMontage;
@@ -90,4 +95,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
 	class UAnimMontage* RightMoveAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= Animation)
+	class UAnimMontage* DeathMontage;
 };

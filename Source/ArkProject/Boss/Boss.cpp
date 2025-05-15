@@ -144,6 +144,29 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	{
 		// 사망 이벤트 호출
 		OnDeath();
+		
+		// 사망 애니메이션 재생
+		UBossAnimInstance* AnimInstance = Cast<UBossAnimInstance>(GetMesh()->GetAnimInstance());
+		if (AnimInstance)
+		{
+			AnimInstance->PlayDeathMontage();
+			
+			// 충돌 비활성화
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			
+			// 모든 공격 충돌 비활성화
+			ActivateLeftHandAttack(false);
+			ActivateRightHandAttack(false);
+			ActivateTailAttack(false);
+			ActivateGroundAttack(false);
+			
+			// 5초 후 액터 파괴
+			FTimerHandle DestroyTimerHandle;
+			GetWorldTimerManager().SetTimer(DestroyTimerHandle, [this]()
+			{
+				this->Destroy();
+			}, 5.0f, false);
+		}
 	}
 	
 	return ActualDamage;

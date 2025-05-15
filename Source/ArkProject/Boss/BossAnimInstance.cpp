@@ -210,3 +210,11 @@ void UBossAnimInstance::AnimNotify_GroundAttackEnd()
 	}
 }
 
+void UBossAnimInstance::PlayDeathMontage()
+{
+	if (Boss)
+	{
+		Boss->PlayAnimMontage(DeathMontage, 1.0f);
+	}
+}
+
