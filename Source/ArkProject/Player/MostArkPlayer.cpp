@@ -4,7 +4,8 @@
 
 #include "Components/InputComponent.h"
 #include "../HUD/TripodSystemHUD.h"
-#include "ArkProject/UI/PlayerHPWidget.h"
+#include "ArkProject/Widget/GameOverWidget.h"
+#include "ArkProject/Widget/PlayerHPWidget.h"
 #include "ArkProject/Widget/PlayerSkillWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -201,7 +202,8 @@ void AMostArkPlayer::SetupPlayerInputComponent(UInputComponent *PlayerInputCompo
 
 void AMostArkPlayer::GameOver()
 {
-    // TODO :: 게임오버 처리
+    GameOverWidget = CreateWidget<UGameOverWidget>(GetWorld(), GameOverWidgetFactory);
+    GameOverWidget->AddToViewport(0);
 }
 
 float AMostArkPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,

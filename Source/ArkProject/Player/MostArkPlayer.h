@@ -144,10 +144,16 @@ public:
     float MaxHP = 500.f;
 
     // 플레이어 체력 UI
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "UI")
     TSubclassOf<class UPlayerHPWidget> HPWidgetFactory;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "UI")
     class UPlayerHPWidget* HPWidget;
+
+    // 게임 오버 UI
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "UI")
+    TSubclassOf<class UGameOverWidget> GameOverWidgetFactory;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "UI")
+    class UGameOverWidget* GameOverWidget;
 
     // 스킬 사용 함수
     UFUNCTION(BlueprintCallable, Category = "Skill")
