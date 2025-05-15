@@ -2,11 +2,9 @@
 
 #include "BTTask_BossSelectAttack.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIController.h"
 #include "../Boss.h"
 #include "../BossAnimInstance.h"
 #include "GameFramework/Character.h"
-#include "Kismet/KismetMathLibrary.h"
 
 UBTTask_BossSelectAttack::UBTTask_BossSelectAttack()
 {
@@ -44,6 +42,21 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
         return EBTNodeResult::Failed;
     }
     
+    // 보스와 플레이어 간의 거리 계산
+    float DistanceToPlayer = FVector::Dist(Boss->GetActorLocation(), PlayerCharacter->GetActorLocation());
+    
+    // 공격 가능 범위 가져오기
+    float AttackRange = BlackboardComp->GetValueAsFloat("AttackRange");
+    
+    // 플레이어가 공격 범위 내에 있는지 확인
+    if (DistanceToPlayer <= AttackRange)
+    {
+        // 공격 범위 내에 없으면 블랙보드 값 업데이트
+        BlackboardComp->SetValueAsBool("IsInAttackRange", false);
+
+        return EBTNodeResult::Failed;
+    }
+    
     // 플레이어와의 각도 계산
     float AngleToPlayer = CalculateAngleToPlayer(Boss, PlayerCharacter);
     
@@ -77,7 +90,6 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
     }
     else if (AngleToPlayer < -FrontAttackAngleThreshold && AngleToPlayer >= -SideAttackAngleThreshold)
     {
-        // 좌측 이동 공격 (아직 구현되지 않음)
         BlackboardComp->SetValueAsEnum("AttackType", 3); // 3: 좌측 이동 공격
         
         BossAnim->PlayLeftMoveAttackMontage();
@@ -86,7 +98,6 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
     }
     else if (AngleToPlayer > FrontAttackAngleThreshold && AngleToPlayer <= SideAttackAngleThreshold)
     {
-        // 우측 이동 공격 (아직 구현되지 않음)
         BlackboardComp->SetValueAsEnum("AttackType", 4); // 4: 우측 이동 공격
         
         BossAnim->PlayRightMoveAttackMontage();

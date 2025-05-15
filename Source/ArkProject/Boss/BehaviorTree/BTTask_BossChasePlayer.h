@@ -23,7 +23,7 @@ public:
 private:
 	// 목적지에 도달했다고 판단하는 거리
 	UPROPERTY(EditAnywhere, Category = "Chase", meta = (AllowPrivateAccess = "true"))
-	float AcceptanceRadius = 50.0f;
+	float AcceptanceRadius = 200.0f;
 	
 	// 플레이어 위치 업데이트 간격
 	UPROPERTY(EditAnywhere, Category = "Chase", meta = (AllowPrivateAccess = "true"))

@@ -5,7 +5,6 @@
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
-#include "BehaviorTree/BlackboardComponent.h"
 
 ABoss* UBossBTTaskBase::GetBossCharacter(UBehaviorTreeComponent* OwnerComp) const
 {

@@ -127,7 +127,7 @@ void UBTTask_BossChasePlayer::TickTask(UBehaviorTreeComponent& OwnerComp, uint8*
         // 공격 범위 내에 있으면 블랙보드 값 업데이트
         BlackboardComp->SetValueAsBool("IsInAttackRange", true);
         
-        // 태스크 완료
     }
+        // 태스크 완료
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 }

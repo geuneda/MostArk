@@ -23,7 +23,7 @@ public:
 private:
 	// 그라운드 공격 지속 시간
 	UPROPERTY(EditAnywhere, Category = "Attack", meta = (AllowPrivateAccess = "true"))
-	float GroundAttackDuration = 5.0f;
+	float GroundAttackDuration = 7.0f;
 	
 	// 현재 경과 시간
 	float CurrentTime = 0.0f;

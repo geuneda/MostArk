@@ -2,7 +2,6 @@
 
 #include "BTTask_BossGroundAttack.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "AIController.h"
 #include "../Boss.h"
 #include "../BossAnimInstance.h"
 #include "GameFramework/Character.h"
