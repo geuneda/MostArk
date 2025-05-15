@@ -15,6 +15,7 @@ class ARKPROJECT_API UPlayerAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	float WalkSpeed;
 

@@ -3,6 +3,7 @@
 
 #include "Boss.h"
 
+#include "BossAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../UI/DamageTextActor.h"
@@ -53,6 +54,10 @@ ABoss::ABoss()
 	GroundHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	GroundHitCollision->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
 	GroundHitCollision->SetHiddenInGame(false);
+
+	// 밀림 현상 방지
+	GetCharacterMovement()->bEnablePhysicsInteraction = false;
+	GetCharacterMovement()->PushForceFactor = 0;
 }
 
 // Called when the game starts or when spawned
@@ -79,7 +84,6 @@ void ABoss::BeginPlay()
 void ABoss::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input

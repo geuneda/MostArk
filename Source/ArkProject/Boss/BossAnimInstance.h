@@ -21,6 +21,8 @@ public:
 	
 	virtual void NativeBeginPlay() override;
 
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class ABoss* Boss;
 	

@@ -3,12 +3,27 @@
 
 #include "BossAnimInstance.h"
 #include "Boss.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UBossAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 
 	InitializeBoss();
+}
+
+void UBossAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+{
+	Super::NativeUpdateAnimation(DeltaSeconds);
+
+	if (UKismetMathLibrary::VSizeXY(GetOwningActor()->GetVelocity()) > 0.1f)
+	{
+		bIsRun = true;
+	}
+	else
+	{
+		bIsRun = false;
+	}
 }
 
 void UBossAnimInstance::InitializeBoss()

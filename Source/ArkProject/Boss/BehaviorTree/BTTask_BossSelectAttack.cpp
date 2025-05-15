@@ -49,7 +49,7 @@ EBTNodeResult::Type UBTTask_BossSelectAttack::ExecuteTask(UBehaviorTreeComponent
     float AttackRange = BlackboardComp->GetValueAsFloat("AttackRange");
     
     // 플레이어가 공격 범위 내에 있는지 확인
-    if (DistanceToPlayer <= AttackRange)
+    if (DistanceToPlayer >= AttackRange)
     {
         // 공격 범위 내에 없으면 블랙보드 값 업데이트
         BlackboardComp->SetValueAsBool("IsInAttackRange", false);
