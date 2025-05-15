@@ -10,9 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Particles/ParticleSystem.h"
 #include "Kismet/GameplayStatics.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "Components/BoxComponent.h"
 
 AMostArkPlayer::AMostArkPlayer()
