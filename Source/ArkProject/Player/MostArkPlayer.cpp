@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MostArkPlayer.h"
+
 #include "Components/InputComponent.h"
 #include "../HUD/TripodSystemHUD.h"
+#include "ArkProject/UI/PlayerHPWidget.h"
 #include "ArkProject/Widget/PlayerSkillWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
@@ -159,6 +161,16 @@ void AMostArkPlayer::BeginPlay()
             }
         }
     }
+
+    if (HPWidgetFactory)
+    {
+        HPWidget = CreateWidget<UPlayerHPWidget>(GetWorld(), HPWidgetFactory);
+        if (HPWidget)
+        {
+            HPWidget->AddToViewport(0);
+            HPWidget->SetHPPercent(CurrentHP, MaxHP);
+        }
+    }
     
     // 쿨다운 텍스트 업데이트 타이머 설정 (0.1초마다 업데이트)
     GetWorld()->GetTimerManager().SetTimer(
@@ -167,6 +179,8 @@ void AMostArkPlayer::BeginPlay()
         &AMostArkPlayer::UpdateCooldownTexts,
         0.1f,
         true);
+
+    CurrentHP = MaxHP;
 }
 
 void AMostArkPlayer::Tick(float DeltaTime)
@@ -183,6 +197,28 @@ void AMostArkPlayer::SetupPlayerInputComponent(UInputComponent *PlayerInputCompo
     PlayerInputComponent->BindAction(TEXT("UseSkill1"), IE_Pressed, this, &AMostArkPlayer::UseSkill1);
     PlayerInputComponent->BindAction(TEXT("UseSkill2"), IE_Pressed, this, &AMostArkPlayer::UseSkill2);
     PlayerInputComponent->BindAction(TEXT("UseSkill3"), IE_Pressed, this, &AMostArkPlayer::UseSkill3);
+}
+
+void AMostArkPlayer::GameOver()
+{
+    // TODO :: 게임오버 처리
+}
+
+float AMostArkPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+                                 class AController* EventInstigator, AActor* DamageCauser)
+{
+    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    CurrentHP = FMath::Max(0.0f, CurrentHP - ActualDamage);
+
+    HPWidget->SetHPPercent(CurrentHP, MaxHP);
+
+    if (CurrentHP <= 0.0f)
+    {
+        GameOver();
+    }
+
+    return ActualDamage;
 }
 
 // 스킬 사용 함수

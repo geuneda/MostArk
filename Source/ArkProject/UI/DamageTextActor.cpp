@@ -13,7 +13,7 @@ ADamageTextActor::ADamageTextActor()
 	TextRender->SetHorizontalAlignment(EHTA_Center);
 	TextRender->SetVerticalAlignment(EVRTA_TextCenter);
 	TextRender->SetTextRenderColor(FColor::White);
-	TextRender->SetWorldSize(20.0f); // 텍스트 크기
+	TextRender->SetWorldSize(40.f); // 텍스트 크기
 	
 	// 기본 값 설정
 	MaxLifeTime = 2.0f;
@@ -76,7 +76,7 @@ void ADamageTextActor::Initialize(float Damage, bool bInIsCritical)
 	TextRender->SetTextRenderColor(TextColor);
 	
 	// 크리티컬이면 텍스트 크기 증가
-	float TextSize = bIsCritical ? 30.0f : 20.0f;
+	float TextSize = bIsCritical ? 80.0f : 40.0f;
 	TextRender->SetWorldSize(TextSize);
 	
 	// 약간의 랜덤 오프셋 추가 (여러 데미지 텍스트가 겹치지 않도록)

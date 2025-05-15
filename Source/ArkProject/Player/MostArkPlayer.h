@@ -133,6 +133,22 @@ public:
     // 입력 바인딩을 위한 함수
     virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+    void GameOver();
+    // 데미지 처리 함수 오버라이드
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+    // 플레이어 체력
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float CurrentHP = 500.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    float MaxHP = 500.f;
+
+    // 플레이어 체력 UI
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    TSubclassOf<class UPlayerHPWidget> HPWidgetFactory;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Skill")
+    class UPlayerHPWidget* HPWidget;
+
     // 스킬 사용 함수
     UFUNCTION(BlueprintCallable, Category = "Skill")
     void UseSkill(int32 SkillIndex);

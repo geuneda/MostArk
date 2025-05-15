@@ -110,10 +110,6 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 	// 데미지 텍스트 표시
 	if (ActualDamage > 0.0f && DamageTextActorClass)
 	{
-		// 플레이어 컨트롤러 가져오기
-		APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (PC)
-		{
 			// 데미지 위치 (머리 위쪽으로 약간 올림)
 			FVector DamageLocation = this->GetActorLocation() + FVector(0, 0, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 1.2f);
 			
@@ -137,7 +133,7 @@ float ABoss::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, ACo
 			{
 				DamageActor->Initialize(ActualDamage, bIsCritical);
 			}
-		}
+		
 	}
 	
 	// 데미지 이벤트 호출
