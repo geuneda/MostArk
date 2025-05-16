@@ -49,7 +49,7 @@ public:
 	float GroundAttackDamage = 30.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float MaxHealth = 1000000.f;
+	float MaxHealth = 1000.f;
 
 	// 현재 체력 getter
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -144,11 +144,11 @@ public:
 
 	// VFX 스케일 조정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-	FVector GroundAttackVFXScale = FVector(1.0f, 1.0f, 1.0f);
+	FVector GroundAttackVFXScale = FVector(3.f, 3.f, 3.f);
 
 	// 종료 VFX 스케일 조정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-	FVector GroundAttackFinishVFXScale = FVector(1.5f, 1.5f, 1.5f);
+	FVector GroundAttackFinishVFXScale = FVector(3.f, 3.f, 3.f);
 
 	// VFX 위치 오프셋
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
