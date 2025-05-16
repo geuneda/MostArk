@@ -151,11 +151,14 @@ void UBTTask_BossGroundAttack::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
         {
             if (GroundAttackFinishVFXComponent)
             {
+                // 페이드아웃 효과 적용
                 GroundAttackFinishVFXComponent->SetFloatParameter(TEXT("FadeOutMultiplier"), 1.0f);
-                GroundAttackFinishVFXComponent->SetAutoDestroy(true);
+                // Deactivate 사용(풀링된 컴포넌트)
+                GroundAttackFinishVFXComponent->Deactivate();
+                // 참조 초기화
                 GroundAttackFinishVFXComponent = nullptr;
             }
-        }, 1.0f, false);
+        }, 3.0f, false);
         
         // 태스크 완료
         FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
@@ -170,8 +173,8 @@ void UBTTask_BossGroundAttack::CleanupVFX()
         // 페이드아웃 효과를 적용하여 서서히 사라지게 함
         GroundAttackVFXComponent->SetFloatParameter(TEXT("FadeOutMultiplier"), 1.0f);
         
-        // 2초 후 자동 제거되도록 설정
-        GroundAttackVFXComponent->SetAutoDestroy(true);
+        // Deactivate 사용(풀링된 컴포넌트)
+        GroundAttackVFXComponent->Deactivate();
         
         // 참조 초기화
         GroundAttackVFXComponent = nullptr;

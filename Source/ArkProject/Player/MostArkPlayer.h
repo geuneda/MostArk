@@ -208,6 +208,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Skill")
     void ResetSkillCooldown(int32 SkillIndex);
 
+    // 스킬 타격 VFX
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
+    UNiagaraSystem* AttackVFX;
+
     float DamageMultiplier = 1.f;
 
     // 데미지 계산 함수 추가

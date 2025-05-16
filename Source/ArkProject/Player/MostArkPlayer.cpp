@@ -2,6 +2,7 @@
 
 #include "MostArkPlayer.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "Components/InputComponent.h"
 #include "../HUD/TripodSystemHUD.h"
 #include "ArkProject/Widget/GameOverWidget.h"
@@ -1373,6 +1374,11 @@ void AMostArkPlayer::OnSwordCollisionBeginOverlap(UPrimitiveComponent* Overlappe
         }
         
         UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, GetController(), this, nullptr);
+
+        if (AttackVFX)
+        {
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), AttackVFX, OtherActor->GetActorLocation(), FRotator::ZeroRotator, FVector(3,3,3));
+        }
         
         // 데미지가 적용되었음을 표시
         bDamageAppliedForSwordAnimation = true;
