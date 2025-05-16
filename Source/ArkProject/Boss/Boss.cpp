@@ -302,42 +302,23 @@ UNiagaraComponent* ABoss::SpawnGroundAttackVFX(const FVector& Location)
 		UE_LOG(LogTemp, Warning, TEXT("Boss - GroundAttackVFX가 설정되지 않았습니다."));
 		return nullptr;
 	}
-
-	// 위치에 레이캐스트를 수행하여 바닥 위치 찾기
-	FHitResult HitResult;
-	FVector TraceStart = Location;
-	FVector TraceEnd = Location - FVector(0, 0, 500.0f); // 아래로 500 유닛 레이캐스트
-
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // 자신은 무시
-
-	// 레이캐스트 수행
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
-	{
-		// 바닥 위치에 VFX 생성
-		FVector SpawnLocation = HitResult.Location + GroundAttackVFXOffset;
-		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			GroundAttackVFX,
-			SpawnLocation,
-			FRotator::ZeroRotator,
-			GroundAttackVFXScale,
-			true,
-			true,
-			ENCPoolMethod::AutoRelease
-		);
-
+	
+	FVector SpawnLocation = GetActorLocation();
+	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		GroundAttackVFX,
+		SpawnLocation,
+		FRotator::ZeroRotator,
+		GroundAttackVFXScale,
+		true,
+		true,
+		ENCPoolMethod::AutoRelease);
+	
 		if (NiagaraComp)
 		{
 			UE_LOG(LogTemp, Log, TEXT("Boss - 그라운드 공격 시작 VFX 생성 성공: %s"), *SpawnLocation.ToString());
 		}
 		return NiagaraComp;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Boss - 바닥 위치를 찾을 수 없습니다. VFX 생성 실패."));
-		return nullptr;
-	}
 }
 
 // 그라운드 공격 종료 VFX 스폰 함수
@@ -349,42 +330,24 @@ UNiagaraComponent* ABoss::SpawnGroundAttackFinishVFX(const FVector& Location)
 		UE_LOG(LogTemp, Warning, TEXT("Boss - GroundAttackFinishVFX가 설정되지 않았습니다."));
 		return nullptr;
 	}
+	
+	FVector SpawnLocation = GetActorLocation();
+	UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+		GetWorld(),
+		GroundAttackFinishVFX,
+		SpawnLocation,
+		FRotator::ZeroRotator,
+		GroundAttackFinishVFXScale,
+		true,
+		true,
+		ENCPoolMethod::AutoRelease
+	);
 
-	// 위치에 레이캐스트를 수행하여 바닥 위치 찾기
-	FHitResult HitResult;
-	FVector TraceStart = Location;
-	FVector TraceEnd = Location - FVector(0, 0, 500.0f); // 아래로 500 유닛 레이캐스트
-
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this); // 자신은 무시
-
-	// 레이캐스트 수행
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, QueryParams))
+	if (NiagaraComp)
 	{
-		// 바닥 위치에 VFX 생성
-		FVector SpawnLocation = HitResult.Location + GroundAttackFinishVFXOffset;
-		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(),
-			GroundAttackFinishVFX,
-			SpawnLocation,
-			FRotator::ZeroRotator,
-			GroundAttackFinishVFXScale,
-			true,
-			true,
-			ENCPoolMethod::AutoRelease
-		);
-
-		if (NiagaraComp)
-		{
-			UE_LOG(LogTemp, Log, TEXT("Boss - 그라운드 공격 종료 VFX 생성 성공: %s"), *SpawnLocation.ToString());
-		}
-		return NiagaraComp;
+		UE_LOG(LogTemp, Log, TEXT("Boss - 그라운드 공격 종료 VFX 생성 성공: %s"), *SpawnLocation.ToString());
 	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Boss - 바닥 위치를 찾을 수 없습니다. 종료 VFX 생성 실패."));
-		return nullptr;
-	}
+	return NiagaraComp;
 }
 
 // 데미지 효과 VFX 스폰 함수
