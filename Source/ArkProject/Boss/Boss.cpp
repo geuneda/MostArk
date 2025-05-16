@@ -34,28 +34,28 @@ ABoss::ABoss()
 	LeftHitCollision->SetupAttachment(GetMesh(), TEXT("hand_l"));
 	LeftHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	LeftHitCollision->SetBoxExtent(FVector(15.0f, 15.0f, 15.0f));
-	LeftHitCollision->SetHiddenInGame(false);
+	LeftHitCollision->SetHiddenInGame(true);
 
 	// 오른손 충돌 컴포넌트 초기화
 	RightHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("RightHitCollision"));
 	RightHitCollision->SetupAttachment(GetMesh(), TEXT("hand_r"));
 	RightHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	RightHitCollision->SetBoxExtent(FVector(15.0f, 15.0f, 15.0f));
-	RightHitCollision->SetHiddenInGame(false);
+	RightHitCollision->SetHiddenInGame(true);
 
 	// 꼬리 충돌 컴포넌트 초기화
 	BackHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BackHitCollision"));
 	BackHitCollision->SetupAttachment(GetMesh(), TEXT("TailSocket"));
 	BackHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	BackHitCollision->SetBoxExtent(FVector(20.0f, 20.0f, 20.0f));
-	BackHitCollision->SetHiddenInGame(false);
+	BackHitCollision->SetHiddenInGame(true);
 
 	// 그라운드 패턴 컴포넌트 초기화
 	GroundHitCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("GroundHitCollision"));
 	GroundHitCollision->SetupAttachment(GetMesh(), TEXT("GroundSocket"));
 	GroundHitCollision->SetCollisionProfileName(TEXT("NoCollision"));
 	GroundHitCollision->SetBoxExtent(FVector(100.0f, 100.0f, 100.0f));
-	GroundHitCollision->SetHiddenInGame(false);
+	GroundHitCollision->SetHiddenInGame(true);
 
 	// 밀림 현상 방지
 	GetCharacterMovement()->bEnablePhysicsInteraction = false;
