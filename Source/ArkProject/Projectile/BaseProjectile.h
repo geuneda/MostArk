@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NiagaraComponentPool.h"
 #include "ArkProject/Struct/AttackInfo.h"
 #include "GameFramework/Actor.h"
 #include "BaseProjectile.generated.h"
@@ -24,10 +23,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-
-	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class USphereComponent* CollisionComp;

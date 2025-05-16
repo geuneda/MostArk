@@ -199,6 +199,7 @@ void AMostArkPlayer::SetupPlayerInputComponent(UInputComponent *PlayerInputCompo
     PlayerInputComponent->BindAction(TEXT("UseSkill1"), IE_Pressed, this, &AMostArkPlayer::UseSkill1);
     PlayerInputComponent->BindAction(TEXT("UseSkill2"), IE_Pressed, this, &AMostArkPlayer::UseSkill2);
     PlayerInputComponent->BindAction(TEXT("UseSkill3"), IE_Pressed, this, &AMostArkPlayer::UseSkill3);
+    PlayerInputComponent->BindAction(TEXT("Cheat"), IE_Pressed, this, &AMostArkPlayer::UseCheat);
 }
 
 void AMostArkPlayer::GameOver()
@@ -1124,6 +1125,11 @@ void AMostArkPlayer::UseSkill3()
     {
         UE_LOG(LogTemp, Warning, TEXT("스킬 3(%s)이 쿨다운 중입니다!"), *Skills[2].SkillName);
     }
+}
+
+void AMostArkPlayer::UseCheat()
+{
+    BaseMultiplier = 50.f;
 }
 
 // 스킬 쿨다운 체크 함수

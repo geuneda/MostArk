@@ -199,6 +199,9 @@ public:
     
     UFUNCTION(BlueprintCallable, Category = "Skill")
     void UseSkill3();
+
+    UFUNCTION(BlueprintCallable, Category = "Skill")
+    void UseCheat();
     
     // 스킬 쿨다운 체크 함수
     UFUNCTION(BlueprintCallable, Category = "Skill")
@@ -210,7 +213,7 @@ public:
 
     // 스킬 타격 VFX
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "VFX")
-    UNiagaraSystem* AttackVFX;
+    class UNiagaraSystem* AttackVFX;
 
     float DamageMultiplier = 1.f;
 
